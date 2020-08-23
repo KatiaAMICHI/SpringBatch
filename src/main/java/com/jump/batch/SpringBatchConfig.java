@@ -28,13 +28,7 @@ import org.tuxdevelop.spring.batch.lightmin.annotation.EnableLightminEmbedded;
 import javax.sql.DataSource;
 import java.util.List;
 
-
-@SpringBootApplication
-@EnableEurekaClient
-@EnableTransactionManagement
-@EnableLightminEmbedded
 public class SpringBatchConfig {
-    private static Logger log = LoggerFactory.getLogger(SpringBatchConfig.class);
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
@@ -89,20 +83,5 @@ public class SpringBatchConfig {
         assetLineMapper.setFieldSetMapper(fieldSetMapper);
         return assetLineMapper;
     }
-
-    @Bean
-    public ItemWriter<Asset> customerItemWriter() {
-        return new ItemWriter<Asset>() {
-            public void write(List<? extends Asset> customers) throws Exception {
-                if (!customers.isEmpty()) {
-                    for (final Asset customer : customers) {
-                        log.info("Processed: {}", customer);
-                    }
-                }
-            }
-        };
-    }
-
-
 
 }
