@@ -23,11 +23,4 @@ public final class Asset {
     @Size(max = 255, message = "Asset.label must be less than 255 characters")
     private String label;
 
-    public void setLabel(String newLabel) {
-        this.label = newLabel;
-    }
-
-    public String getLabel() {
-        return this.label;
-    }
 }

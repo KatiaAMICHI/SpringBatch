@@ -7,12 +7,14 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/job")
 public class JobRestController {
 
     @Autowired
@@ -20,6 +22,11 @@ public class JobRestController {
 
     @Autowired
     private Job job;
+
+    @GetMapping
+    public String get() throws Exception {
+        return "get_test";
+    }
 
     @GetMapping("/getJob")
     public BatchStatus load() throws Exception {
@@ -34,8 +41,5 @@ public class JobRestController {
 
         return jobExecution.getStatus();
     }
-
-
-
 
 }

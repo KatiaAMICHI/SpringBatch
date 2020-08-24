@@ -1,8 +1,6 @@
 package com.jump.batch;
 
 import com.jump.batch.obj.Asset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -10,7 +8,6 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
@@ -18,16 +15,11 @@ import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.tuxdevelop.spring.batch.lightmin.annotation.EnableLightminEmbedded;
 
-import javax.sql.DataSource;
-import java.util.List;
-
+@Configuration
 public class SpringBatchConfig {
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
@@ -70,13 +62,13 @@ public class SpringBatchConfig {
         return assetFlatFileItemReader;
     }
 
-    @Bean
     public LineMapper<Asset> lineMapping() {
         DefaultLineMapper<Asset> assetLineMapper = new DefaultLineMapper<Asset>();
         DelimitedLineTokenizer delimitedLineTokenizer = new DelimitedLineTokenizer();
         delimitedLineTokenizer.setDelimiter(",");
         delimitedLineTokenizer.setStrict(false);
-        delimitedLineTokenizer.setNames("name,label");
+        String [] locFields = {"name", "label"};
+        delimitedLineTokenizer.setNames(locFields);
         assetLineMapper.setLineTokenizer(delimitedLineTokenizer);
         BeanWrapperFieldSetMapper fieldSetMapper = new BeanWrapperFieldSetMapper();
         fieldSetMapper.setTargetType(Asset.class);
