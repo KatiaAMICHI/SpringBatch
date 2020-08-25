@@ -2,14 +2,11 @@ package com.jump.batch;
 
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import javax.sql.DataSource;
 
@@ -38,43 +35,4 @@ public class JobServerConfiguration {
         return locBuild;
     }
 
-    /*@Bean
-    public JobConfigurationRepository jobConfigRepo() {
-        return new JobConfigurationRepository() {
-            @Override
-            public JobConfiguration getJobConfiguration(Long aLong, String s) throws NoSuchJobConfigurationException {
-                return null;
-            }
-
-            @Override
-            public Collection<JobConfiguration> getJobConfigurations(String s, String s1) throws NoSuchJobException, NoSuchJobConfigurationException {
-                return null;
-            }
-
-            @Override
-            public JobConfiguration add(JobConfiguration jobConfiguration, String s) {
-                return null;
-            }
-
-            @Override
-            public JobConfiguration update(JobConfiguration jobConfiguration, String s) throws NoSuchJobConfigurationException {
-                return null;
-            }
-
-            @Override
-            public void delete(JobConfiguration jobConfiguration, String s) throws NoSuchJobConfigurationException {
-
-            }
-
-            @Override
-            public Collection<JobConfiguration> getAllJobConfigurations(String s) {
-                return null;
-            }
-
-            @Override
-            public Collection<JobConfiguration> getAllJobConfigurationsByJobNames(Collection<String> collection, String s) {
-                return null;
-            }
-        };
-    }*/
 }
