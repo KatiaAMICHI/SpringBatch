@@ -5,64 +5,82 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Configuration
 @Slf4j
 @EnableAsync
 public class JobBatchLauncher {
+    static final private String JOB_NAME1 = "jobA";
+    static final private String JOB_NAME2 = "job";
+    static final private String JOB_NAME3 = "jobC";
+    static final private String TIME = "00 16 11 * * ?";
+
     @Autowired
-    private JobExplorer jobExplorer;
+    private JdbcOperations jdbcOperations;
+
     @Autowired
     private JobLauncher jobLauncher;
-    @Autowired @Qualifier("jobC")
-    private Job job;
+    @Autowired @Qualifier(JOB_NAME1)
+    private Job job1;
 
-    //@Async
-    //@Scheduled(fixedRate = 7000)
+    @Autowired @Qualifier(JOB_NAME2)
+    private Job job2;
+
+    @Autowired @Qualifier(JOB_NAME3)
+    private Job job3;
+
+    @Async
+    @Scheduled(fixedRate = 100000000)
+    //@Scheduled(cron = TIME)
     public void run() throws Exception {
-        log.info("[Job] ....... run1");
-        runJobB();
+        log.info("[Job1] ....... run1");
+        runJobB(this.job1);
     }
 
-    //@Async
     //@Scheduled(fixedRate = 7000)
+    @Scheduled(fixedRate = 100000000)
+    @Scheduled(cron = TIME)
     public void run1() throws Exception {
-        log.info("[Job] ....... run1");
-        runJobB();
+        Thread.sleep(5000);
+        log.info("[Job2] ....... run1");
+        runJobB(this.job2);
     }
 
-    private void runJobB() throws Exception {
+    @Async
+    @Scheduled(fixedRate = 100000000)
+    public void run3() throws Exception {
+        log.info("[Job3] ....... run1");
+        Thread.sleep(11000);
+        runJobB(this.job3);
+    }
 
+    private void runJobB(Job parJob) throws Exception {
         log.info("[Job] running ...........");
 
         Map<String, JobParameter> confMap = new HashMap<>();
-
-        confMap.put("value", new JobParameter("label_test"));
-        confMap.put("time", new JobParameter(System.currentTimeMillis()));
+        confMap.put("value", new JobParameter("label_test5"));
         JobParameters jobParameters = new JobParameters(confMap);
 
-        // récupérer les param du dernier job qui a été lancé
-        // JobParameters jobParams = job.getJobParametersIncrementer().getNext(jobParameters);
-        List<JobExecution> jobExecutionList = new ArrayList<>(jobExplorer.findRunningJobExecutions("jobC"));
-
-        if (jobExecutionList.size() < 1) {
+        CustomSimpleJobLauncher customSimpleJobLauncher = new CustomSimpleJobLauncher(jdbcOperations);
+        if(customSimpleJobLauncher.canRunJob(parJob, jobParameters)) {
             try {
-                jobLauncher.run(job, jobParameters);
+                jobLauncher.run(parJob, jobParameters);
             } catch (Exception ex) {
-                log.error("job1 : " + ex.getMessage());
+                log.error("[RUN JOB] : " + ex.getMessage());
             }
         }
     }

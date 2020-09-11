@@ -22,8 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -38,14 +37,21 @@ public class CustomerJobConfiguration {
     @Autowired private ItemWriter<Asset> assetItemWriter;
     @Autowired private ItemProcessor<Asset, Asset> assetAssetItemProcessor;
     @Autowired private InterceptingJobExecution interceptingJob;
-    @Autowired private JobRepository jobRepository;
+
+    @Bean("job")
+    @Primary
+    public Job job() {
+        return jobBuilderFactory
+                .get("job")
+                .start(customerStep())
+                .listener(interceptingJob)
+                .build();
+    }
 
     @Bean("jobA")
-    @Primary
     public Job jobA() {
         return jobBuilderFactory
                 .get("jobA")
-                .incrementer(new CompletedJobRunIdIncrementer(jobRepository, "jobA"))
                 .start(customerStep())
                 .listener(interceptingJob)
                 .build();
@@ -55,7 +61,6 @@ public class CustomerJobConfiguration {
     public Job jobB() {
         return jobBuilderFactory
                 .get("jobB")
-                .incrementer(new CompletedJobRunIdIncrementer(jobRepository, "jobB"))
                 .start(customerStep())
                 .listener(interceptingJob)
                 .build();
@@ -65,7 +70,7 @@ public class CustomerJobConfiguration {
     public Job jobC() {
         return jobBuilderFactory
                 .get("jobC")
-                .incrementer(new CompletedJobRunIdIncrementer(jobRepository, "jobC"))
+                // .incrementer(new CompletedJobRunIdIncrementer(jobRepository, "jobB"))
                 .start(customerStep())
                 .listener(interceptingJob)
                 .build();
@@ -128,6 +133,11 @@ public class CustomerJobConfiguration {
         jobOperator.setJobRegistry(jobRegistry);
         jobOperator.setJobExplorer(jobExplorer);
         return jobOperator;
+    }
+
+    @Bean
+    public JdbcOperations jdbcOperations(final DataSource dataSource) throws Exception {
+        return new JdbcTemplate(dataSource);
     }
 
     @Bean
