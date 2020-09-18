@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
@@ -16,12 +17,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CustomSimpleJobLauncher extends JdbcJobInstanceDao {
     private final JdbcOperations jdbcOperations;
 
     @Nullable
     public synchronized Boolean canRunJob(@NotNull final Job job, @NotNull final JobParameters jobParameters) {
+        log.info("[CustomSimpleJobLauncher] ....... canRunJob");
         final RowMapper<JobInfoDB> locRowMapper = new CustomSimpleJobLauncher.JobInstanceRowMapper();
         final List<JobInfoDB> instances = jdbcOperations.query(this.getQuery("SELECT ji.JOB_INSTANCE_ID, ji.JOB_NAME, je.STATUS, jep.KEY_NAME, jep.STRING_VAL from %PREFIX%JOB_INSTANCE ji, %PREFIX%JOB_EXECUTION je, %PREFIX%JOB_EXECUTION_PARAMS jep where je.JOB_EXECUTION_ID = jep.JOB_EXECUTION_ID and ji.JOB_INSTANCE_ID = je.JOB_INSTANCE_ID and STATUS = ?  and jep.KEY_NAME = ? GROUP BY ji.JOB_INSTANCE_ID"), locRowMapper, new Object[]{"STARTED", "value"});
 

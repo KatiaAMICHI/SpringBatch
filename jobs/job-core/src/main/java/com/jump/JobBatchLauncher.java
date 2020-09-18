@@ -25,7 +25,7 @@ public class JobBatchLauncher {
     static final private String JOB_NAME2 = "job";
     static final private String JOB_NAME3 = "jobC";
     static final private String JOB_NAME0 = "job0";
-    static final private String TIME = "00 25 14 * * ?";
+    static final private String TIME = "00 58 14 * * ?";
 
     @Autowired
     private JdbcOperations jdbcOperations;
@@ -87,7 +87,7 @@ public class JobBatchLauncher {
         confMap.put("time", new JobParameter(System.currentTimeMillis()));
         JobParameters jobParameters = new JobParameters(confMap);
 
-        CustomSimpleJobLauncher customSimpleJobLauncher = new CustomSimpleJobLauncher(jdbcOperations);
+        final CustomSimpleJobLauncher customSimpleJobLauncher = new CustomSimpleJobLauncher(jdbcOperations);
         if(customSimpleJobLauncher.canRunJob(parJob, jobParameters)) {
             try {
                 jobLauncher.run(parJob, jobParameters);

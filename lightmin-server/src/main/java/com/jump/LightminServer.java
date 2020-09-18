@@ -8,9 +8,9 @@ import org.tuxdevelop.spring.batch.lightmin.server.annotation.EnableLightminServ
 
 @SpringBootApplication(exclude={DataSourceAutoConfiguration.class, XADataSourceAutoConfiguration.class})
 @EnableLightminServer
-public class LightminServerSimple {
+public class LightminServer {
 
     public static void main(final String[] args) {
-        SpringApplication.run(LightminServerSimple.class, args);
+        SpringApplication.run(LightminServer.class, args);
     }
 }

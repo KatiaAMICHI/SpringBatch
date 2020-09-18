@@ -22,6 +22,7 @@ public class InterceptingJobExecution implements JobExecutionListener {
 
 
     private void startJob() {
+        log.info("[InterceptingJobExecution] ....... startJob");
         final JobInfo first = CacheBean.pop();
         try {
             jobLauncher.run(first.getJob(), first.getJobParameters());
@@ -33,6 +34,7 @@ public class InterceptingJobExecution implements JobExecutionListener {
     @SneakyThrows
     @Override
     public void afterJob(JobExecution jobExecution) {
+        log.info("[InterceptingJobExecution] ....... afterJob");
         synchronized (jobExecution) {
             log.info("Intercepting Job Excution - After Job!");
             Thread.sleep(11000);

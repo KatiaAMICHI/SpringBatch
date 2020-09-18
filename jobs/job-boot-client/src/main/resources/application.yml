@@ -16,6 +16,8 @@ spring:
         classic:
           server:
             url: http://localhost:50103/lightmin-server
+        client:
+          publish-job-events: true
       batch:
         #default jdbc
         repository-type: jdbc
