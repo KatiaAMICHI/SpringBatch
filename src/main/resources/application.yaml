@@ -1,9 +1,0 @@
-#ligtmin
-  batch:
-     lightmin:
-       repository:
-         jdbc:
-           #override the default table names
-           job-configuration-table-name: job_configuration
-           job-configuration-value-table-name: configuration_value
-           job-configuration-parameter-table-name: configuration_parameter

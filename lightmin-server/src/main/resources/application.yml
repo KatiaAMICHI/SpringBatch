@@ -1,0 +1,16 @@
+server:
+  servlet:
+    context-path: /lightmin-server
+spring:
+  application:
+    name: lightmin-server
+  batch:
+    job:
+      enabled: false
+    lightmin:
+      server:
+        cluster:
+          infinispan:
+            repository:
+              init-scheduler-configuration-repository: true # default false (1)
+              init-scheduler-execution-repository: true # default false (2)

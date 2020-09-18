@@ -2,54 +2,48 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
+    <groupId>com.jump</groupId>
     <artifactId>SpringBatchLightmin</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <packaging>pom</packaging>
+    <version>2.1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>jobs</module>
+        <module>lightmin-server</module>
+    </modules>
 
     <properties>
-        <spring-batch-lightmin.version>2.1.0</spring-batch-lightmin.version>
+        <lightmin.version>2.1.1</lightmin.version>
+        <datafactory.version>0.8</datafactory.version>
+        <!-- plugin versions -->
+        <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.target>1.8</maven-compiler-plugin.target>
+        <maven-compiler-plugin.source>1.8</maven-compiler-plugin.source>
         <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
         <lombok.version>1.18.10</lombok.version>
     </properties>
 
-    <dependencies>
-        <!-- h2 -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.180</version>
-        </dependency>
-        <!-- spring batch lightmin -->
-        <dependency>
-            <groupId>org.tuxdevelop</groupId>
-            <artifactId>spring-batch-lightmin-embedded</artifactId>
-            <version>${spring-batch-lightmin.version}</version>
-        </dependency>
-        <!-- added to use EnableEmbeddedSpringBatchLightminServer -->
-        <dependency>
-            <groupId>org.tuxdevelop</groupId>
-            <artifactId>spring-batch-lightmin-repository-server</artifactId>
-            <version>${spring-batch-lightmin.version}</version>
-        </dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.tuxdevelop</groupId>
+                <artifactId>spring-batch-lightmin-bom</artifactId>
+                <version>${lightmin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
 
+    </dependencyManagement>
+
+    <dependencies>
         <dependency>
-            <groupId>org.tuxdevelop</groupId>
-            <artifactId>spring-batch-lightmin-repository-jdbc</artifactId>
-            <version>${spring-batch-lightmin.version}</version>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.3.0</version>
         </dependency>
         <!-- spring boot -->
         <dependency>
@@ -59,48 +53,43 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-dependencies</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>5.2.4.RELEASE</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
+        <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>2.4.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.9.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.10.0.pr3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.5</version>
-        </dependency>
-
         <!-- swagger -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>1.2.32</version>
         </dependency>
-
     </dependencies>
 
-
+    <build>
+        <plugins>
+            <plugin>
+                <!-- compiler -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${maven-compiler-plugin.source}</source>
+                    <target>${maven-compiler-plugin.target}</target>
+                    <encoding>UTF-8</encoding>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
