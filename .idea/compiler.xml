@@ -8,19 +8,32 @@
         <outputRelativeToContentRoot value="true" />
         <module name="lightmin-server" />
         <module name="job-boot-client" />
-        <module name="job-core" />
-        <module name="jobs" />
+        <module name="cloud-serveur" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="client-job" target="1.8" />
+      <module name="cloud-serveur" target="1.8" />
       <module name="core" target="1.8" />
+      <module name="discovery-client" target="1.8" />
+      <module name="job-client1" target="1.8" />
+      <module name="job-core" target="1.8" />
       <module name="jobs" target="1.8" />
       <module name="jobs-boot-client" target="1.8" />
       <module name="jobs-core" target="1.8" />
       <module name="jobs_core" target="1.8" />
       <module name="lightmin-client" target="1.8" />
       <module name="LightminServer" target="11" />
+      <module name="spring-batch-lightmin-api" target="1.8" />
+      <module name="spring-batch-lightmin-client" target="1.8" />
+      <module name="spring-batch-lightmin-client-core" target="1.8" />
+      <module name="spring-batch-lightmin-client-discovery-consul" target="1.8" />
+      <module name="spring-batch-lightmin-client-discovery-core" target="1.8" />
+      <module name="spring-batch-lightmin-core" target="1.8" />
+      <module name="spring-batch-lightmin-core-batch" target="1.8" />
+      <module name="spring-batch-lightmin-core-configuration" target="1.8" />
+      <module name="spring-batch-lightmin-core-service" target="1.8" />
+      <module name="spring-batch-lightmin-core-starter" target="1.8" />
       <module name="test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
