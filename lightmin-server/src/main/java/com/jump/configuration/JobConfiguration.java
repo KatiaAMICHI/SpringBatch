@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 @EnableLightminEmbedded
 @Slf4j
 public class JobConfiguration {
-    @Bean
+    /*@Bean
     @ServiceActivator(inputChannel = "stepExecutionsChannel")
     public LoggingHandler loggingHandler() {
         LoggingHandler adapter = new LoggingHandler(LoggingHandler.Level.WARN);
@@ -37,7 +37,7 @@ public class JobConfiguration {
     @MessagingGateway(name = "notificationExecutionsListener", defaultRequestChannel = "stepExecutionsChannel")
     public interface NotificationExecutionListener extends StepExecutionListener {
         
-    }
+    }*/
 
     @Bean
     public JobOperator jobOperator(final JobLauncher jobLauncher, final JobRepository jobRepository,

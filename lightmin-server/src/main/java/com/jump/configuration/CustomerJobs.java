@@ -1,6 +1,7 @@
 package com.jump.configuration;
 
 import com.jump.domain.Asset;
+import com.jump.integration.IntegrationGateway;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -35,13 +36,15 @@ public class CustomerJobs {
     private ItemWriter<Asset> assetItemWriter;
     @Autowired @Qualifier("customerItemProcessor")
     private ItemProcessor<Asset, Asset> assetItemProcessor;
+    @Autowired
+    private IntegrationGateway integrationGateway;
 
     @Bean("job")
     @Primary
     public Job job() {
         return jobBuilderFactory
                 .get("job")
-                .start(customerStep())
+                .start(step1Manager())
                 .build();
     }
 
@@ -49,7 +52,7 @@ public class CustomerJobs {
     public Job job0() {
         return jobBuilderFactory
                 .get("job0")
-                .start(customerStep())
+                .start(step1Manager())
                 .build();
     }
 
@@ -57,7 +60,7 @@ public class CustomerJobs {
     public Job jobA() {
         return jobBuilderFactory
                 .get("jobA")
-                .start(customerStep())
+                .start(step1Manager())
                 .build();
     }
 
@@ -65,7 +68,7 @@ public class CustomerJobs {
     public Job jobB() {
         return jobBuilderFactory
                 .get("jobB")
-                .start(customerStep())
+                .start(step1Manager())
                 .build();
     }
 
@@ -73,14 +76,14 @@ public class CustomerJobs {
     public Job jobC() {
         return jobBuilderFactory
                 .get("jobC")
-                .start(customerStep())
+                .start(step1Manager())
                 .build();
     }
 
     @Bean
-    public Step customerStep() {
+    public Step step1Manager() {
         return stepBuilderFactory
-                .get("customerStep")
+                .get("step1.manager")
                 .<Asset, Asset>chunk(1)
                 .reader(assetItemReader)
                 .processor(assetItemProcessor)
@@ -92,10 +95,12 @@ public class CustomerJobs {
     @Bean
     @Qualifier("customerItemReader")
     public ItemReader<Asset> customerItemReader(@Value("#{jobParameters[value]}") final String resource) throws Exception {
-        log.info(".................. ItemReader");
-        log.info("sleep .................. 9000");
-        //Thread.sleep(9000);
-        log.info("end sleep .................. 9000");
+        log.info(".................. customerItemReader");
+        log.info(".................. send message : " + resource);
+        integrationGateway.sendMessage(resource);
+        // log.info("sleep .................. 9000");
+        // Thread.sleep(9000);
+        // log.info("end sleep .................. 9000");
         return new CustomerItemReader(resource);
     }
 
@@ -103,7 +108,7 @@ public class CustomerJobs {
     @Bean
     @Qualifier("customerItemProcessor")
     public ItemProcessor<Asset, Asset> processor() {
-        log.info(".................. ItemReader");
+        log.info(".................. processor");
         return new ItemProcessor<Asset, Asset>() {
             @Override
             public Asset process(Asset asset) throws Exception {
@@ -119,7 +124,7 @@ public class CustomerJobs {
     @Bean
     @Qualifier("customerItemWriter")
     public ItemWriter<Asset> customerItemWriter() {
-        log.info(".................. ItemReader");
+        log.info(".................. customerItemWriter");
         return assets -> {
             if (assets != null && !assets.isEmpty()) {
                 log.info("Write: {}", assets);

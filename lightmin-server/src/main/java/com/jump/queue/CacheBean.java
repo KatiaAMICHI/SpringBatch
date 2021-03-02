@@ -12,7 +12,8 @@ import java.util.Queue;
 @NoArgsConstructor
 public class CacheBean {
 
-    @Getter(AccessLevel.PUBLIC) private static Queue<JobInfo> cacheJob = new LinkedList<>();
+    @Getter(AccessLevel.PUBLIC)
+    private static Queue<JobInfo> cacheJob = new LinkedList<>();
 
     public static void addToMap(Job parJob, JobParameters parJobParameter) {
         cacheJob.add(new JobInfo(parJob, parJobParameter));

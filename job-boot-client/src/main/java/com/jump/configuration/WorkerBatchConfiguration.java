@@ -1,26 +1,19 @@
 package com.jump.configuration;
 
-import com.jump.domain.Asset;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
-import org.springframework.batch.integration.partition.BeanFactoryStepLocator;
 import org.springframework.batch.integration.partition.RemotePartitioningWorkerStepBuilderFactory;
-import org.springframework.batch.integration.partition.StepExecutionRequestHandler;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.IntegrationComponentScan;
-import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
@@ -35,88 +28,78 @@ import org.springframework.integration.jms.dsl.Jms;
 public class WorkerBatchConfiguration {
 
     @Autowired
-    private JobExplorer jobExplorer;
-
-    @Autowired
     private RemotePartitioningWorkerStepBuilderFactory workerStepBuilderFactory;
 
-    @Bean
-    public Step workerStep() {
-        return this.workerStepBuilderFactory
-                .get("workerStep")
-                .inputChannel(inboundRequests())
-                .outputChannel(outboundStaging())
-                .chunk(100)
-                .reader(itemReader())
-                .processor(itemProcessor())
-                .writer(itemWriter())
-                .build();
-    }
-
-    @Bean
-    public StepExecutionRequestHandler stepExecutionRequestHandler() {
-        StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
-        stepExecutionRequestHandler.setJobExplorer(jobExplorer);
-        stepExecutionRequestHandler.setStepLocator(new BeanFactoryStepLocator());
-        return stepExecutionRequestHandler;
-    }
-
-    @Bean
-    @ServiceActivator(inputChannel = "inboundRequests", outputChannel = "outboundStaging")
-    public StepExecutionRequestHandler serviceActivator() throws Exception {
-        return stepExecutionRequestHandler();
-    }
-
-    @Bean
-    public DirectChannel inboundRequests() {
-        return new DirectChannel();
-    }
-
-    @Bean
-    public IntegrationFlow inboundJmsRequests() {
-        return IntegrationFlows
-                .from(Jms.messageDrivenChannelAdapter(connectionFactory())
-                         .configureListenerContainer(c -> c.subscriptionDurable(false))
-                         .destination("requestsQueue"))
-                .channel(inboundRequests())
-                .get();
-    }
-
-    @Bean
-    public DirectChannel outboundStaging() {
-        return new DirectChannel();
-    }
-
-    @Bean
-    public IntegrationFlow outboundJmsStaging() {
-        return IntegrationFlows.from("outboundStaging")
-                               .handle(Jms.outboundGateway(connectionFactory())
-                                          .requestDestination("stagingQueue"))
-                               .get();
-    }
-
+    @Value("${broker.url}")
+    private String brokerUrl;
 
     @Bean
     public ActiveMQConnectionFactory connectionFactory() {
-        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
-        factory.setBrokerURL("vm://localhost?broker.persistent=false");
-        factory.setTrustAllPackages(true);
-        return factory;
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+        connectionFactory.setBrokerURL(this.brokerUrl);
+        connectionFactory.setTrustAllPackages(true);
+        return connectionFactory;
     }
 
     /*
-     * Configure inbound flow (requests going to workers)
+     * Configure inbound flow (requests coming from the master)
      */
     @Bean
-    public QueueChannel replies() {
-        return new QueueChannel();
+    public DirectChannel requests() {
+        return new DirectChannel();
     }
 
+    @Bean
+    public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
+        return IntegrationFlows
+                .from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
+                .channel(requests())
+                .get();
+    }
+
+    /*
+     * Configure outbound flow (replies going to the master)
+     */
+    @Bean
+    public DirectChannel replies() {
+        return new DirectChannel();
+    }
+
+    @Bean
+    public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
+        return IntegrationFlows
+                .from(replies())
+                .handle(Jms.outboundAdapter(connectionFactory).destination("replies"))
+                .get();
+    }
+
+    /*
+     * Configure the worker step
+     */
+    @Bean
+    public Step workerStep() {
+        return this.workerStepBuilderFactory.get("workerStep")
+                                            .inputChannel(requests())
+                                            .outputChannel(replies())
+                                            .tasklet(tasklet(null))
+                                            .build();
+    }
+
+    @Bean
+    @StepScope
+    public Tasklet tasklet(@Value("#{stepExecutionContext['partition']}") String partition) {
+        return (contribution, chunkContext) -> {
+            System.out.println("processing " + partition);
+            log.info("[Worker]... processing " + partition);
+            return RepeatStatus.FINISHED;
+        };
+    }
+    /*
     @StepScope
     @Bean
     @Qualifier("itemReader")
     public ItemReader<Asset> itemReader() {
-        log.info(".................. ItemReader");
+        log.info("[Worker].................. ItemReader");
         log.info("sleep .................. 9000");
         //Thread.sleep(9000);
         log.info("end sleep .................. 9000");
@@ -149,7 +132,6 @@ public class WorkerBatchConfiguration {
             }
         };
     }
-
-
+*/
 
 }

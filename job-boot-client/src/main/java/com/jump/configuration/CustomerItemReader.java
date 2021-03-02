@@ -2,6 +2,7 @@ package com.jump.configuration;
 
 import com.jump.domain.Asset;
 import com.jump.domain.AssetKVRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.IteratorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Collections;
 import java.util.List;
 
-
+@Slf4j
 public class CustomerItemReader implements ItemReader<Asset> {
 
     @Autowired
@@ -25,6 +26,7 @@ public class CustomerItemReader implements ItemReader<Asset> {
 
     @Override
     public Asset read() throws Exception {
+        log.info("reading .................");
         if (delegate == null) {
             delegate = new IteratorItemReader<Asset>(assets());
         }

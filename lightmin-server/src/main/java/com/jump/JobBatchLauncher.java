@@ -1,6 +1,7 @@
 package com.jump;
 
 import com.jump.queue.CustomSimpleJobLauncher;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
@@ -10,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.PollableChannel;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,12 +24,13 @@ import java.util.Map;
 @Configuration
 @Slf4j
 @EnableAsync
+@RequiredArgsConstructor
 public class JobBatchLauncher {
     static final private String JOB_NAME1 = "jobA";
     static final private String JOB_NAME2 = "job";
     static final private String JOB_NAME3 = "jobC";
     static final private String JOB_NAME0 = "job0";
-    static final private String TIME = "40 49 15 * * ?";
+    static final private String TIME = "40 49 16 * * ?"; // second, minute, hour, day of month, month, day(s) of week
 
     @Autowired
     private JdbcOperations jdbcOperations;
@@ -48,11 +53,16 @@ public class JobBatchLauncher {
     @Qualifier(JOB_NAME0)
     private Job job0;
 
+    @Autowired
+    @Qualifier("replies")
+    private final MessageChannel outboudChannel;
+
     @Async
     //@Scheduled(fixedRate = 2000)
-    //@Scheduled(cron = TIME)
+    @Scheduled(cron = TIME)
     public void run0() throws Exception {
         log.info("[Job] ....... run0");
+        outboudChannel.send(new GenericMessage<>("run0"));
         runJobB(this.job0);
     }
 
