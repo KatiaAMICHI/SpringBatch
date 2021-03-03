@@ -6,6 +6,6 @@ import org.springframework.integration.annotation.Gateway;
 @MessagingGateway
 public interface IntegrationGateway {
 
-    @Gateway(requestChannel = "integration.gateway.channel")
+    @Gateway(replyChannel = "replies", requestChannel = "requests")
     public String sendMessage(String message);
 }

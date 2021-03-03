@@ -10,6 +10,8 @@ import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.MessagingGateway;
@@ -17,6 +19,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.tuxdevelop.spring.batch.lightmin.annotation.EnableLightminEmbedded;
 
 import javax.sql.DataSource;
@@ -25,19 +28,6 @@ import javax.sql.DataSource;
 @EnableLightminEmbedded
 @Slf4j
 public class JobConfiguration {
-    /*@Bean
-    @ServiceActivator(inputChannel = "stepExecutionsChannel")
-    public LoggingHandler loggingHandler() {
-        LoggingHandler adapter = new LoggingHandler(LoggingHandler.Level.WARN);
-        adapter.setLoggerName("TEST_LOGGER");
-        adapter.setLogExpressionString("headers.id + ': ' + payload");
-        return adapter;
-    }
-
-    @MessagingGateway(name = "notificationExecutionsListener", defaultRequestChannel = "stepExecutionsChannel")
-    public interface NotificationExecutionListener extends StepExecutionListener {
-        
-    }*/
 
     @Bean
     public JobOperator jobOperator(final JobLauncher jobLauncher, final JobRepository jobRepository,
@@ -66,7 +56,7 @@ public class JobConfiguration {
     }
 
     @Bean
-    public JobLauncher jobLauncher(JobRepository jobRepository) {
+    public JobLauncher jobLauncher(final JobRepository jobRepository) {
         SimpleJobLauncher launcher = new SimpleJobLauncher();
         launcher.setJobRepository(jobRepository);
         return launcher;

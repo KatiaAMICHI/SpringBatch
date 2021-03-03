@@ -2,6 +2,7 @@ package com.jump.integration;
 
 import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import java.util.Map;
  *
  *
  */
+@Configuration
 public class BasicPartitioner extends SimplePartitioner {
 
 	private static final String PARTITION_KEY = "partition";

@@ -1,6 +1,7 @@
 package com.jump.integration;
 
 import com.jump.domain.Asset;
+import com.jump.queue.InterceptingJobExecution;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -18,18 +19,33 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.integration.annotation.IntegrationComponentScan;
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.jms.dsl.Jms;
+import org.springframework.integration.scheduling.PollerMetadata;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.scheduling.support.PeriodicTrigger;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableBatchProcessing
 @EnableBatchIntegration
 @Slf4j
 @RequiredArgsConstructor
+@IntegrationComponentScan
 public class MasterBatchConfiguration {
-
+    @Autowired
+    @Qualifier("inbound")
+    private QueueChannel inboundChannel;
+    @Autowired
+    @Qualifier("outbound")
+    private DirectChannel outboudChannel;
     private final static String MASTER_JOB_TEST = "JOB_MASTER";
     private final static String MATER_JOB_STEP = "STEP-1";
     private final static int CHUNK_SIZE = 50;
@@ -40,7 +56,8 @@ public class MasterBatchConfiguration {
     @Qualifier("customerItemWriter")
     private ItemWriter<Asset> itemWriter;
 
-    private static final int GRID_SIZE = 3;
+    private static final int GRID_SIZE = 1;
+
 
     @Autowired
     private RemotePartitioningMasterStepBuilderFactory masterStepBuilderFactory;
@@ -61,6 +78,7 @@ public class MasterBatchConfiguration {
      */
     @Bean
     @Primary
+    @Qualifier("outbound")
     public DirectChannel requests() {
         return new DirectChannel();
     }
@@ -77,8 +95,9 @@ public class MasterBatchConfiguration {
      * Configure inbound flow (replies coming from workers)
      */
     @Bean
-    public DirectChannel replies() {
-        return new DirectChannel();
+    @Qualifier("inbound")
+    public QueueChannel replies() {
+        return new QueueChannel();
     }
 
     @Bean
@@ -87,6 +106,21 @@ public class MasterBatchConfiguration {
                 .from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
                 .channel(replies())
                 .get();
+    }
+
+    @ServiceActivator(inputChannel = "replies", outputChannel = "requests")
+    public void handle(String in) throws InterruptedException {
+        log.info("receive message from worker : "  + inboundChannel.receive());
+        Thread.sleep(3000);
+    }
+
+
+    @Bean(name = PollerMetadata.DEFAULT_POLLER)
+    public PollerMetadata defaultPoller() {
+
+        PollerMetadata pollerMetadata = new PollerMetadata();
+        pollerMetadata.setTrigger(new PeriodicTrigger(10));
+        return pollerMetadata;
     }
 
     /*
@@ -107,6 +141,21 @@ public class MasterBatchConfiguration {
         return this.jobBuilderFactory.get("remotePartitioningJobMy")
                                      .incrementer(new RunIdIncrementer())
                                      .start(masterStep())
+                                     .listener(new InterceptingJobExecution())
                                      .build();
     }
+
+    /*
+     * Configure the ChunkMessageChannelItemWriter
+     */
+    /*@Bean
+    public ItemWriter<Integer> itemWriter() {
+        MessagingTemplate messagingTemplate = new MessagingTemplate();
+        messagingTemplate.setDefaultChannel(requests());
+        messagingTemplate.setReceiveTimeout(2000);
+        ChunkMessageChannelItemWriter<Integer> chunkMessageChannelItemWriter = new ChunkMessageChannelItemWriter<>();
+        chunkMessageChannelItemWriter.setMessagingOperations(messagingTemplate);
+        chunkMessageChannelItemWriter.setReplyChannel(replies());
+        return chunkMessageChannelItemWriter;
+    }*/
 }
