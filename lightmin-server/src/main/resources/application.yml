@@ -1,9 +1,10 @@
-server:
-  servlet:
-    context-path: /lightmin-server
+# to define server name
+#server:
+ # servlet:
+  #  context-path: #
 spring:
   application:
-    name: lightmin-server
+    name: jobServer
   batch:
     job:
       enabled: false

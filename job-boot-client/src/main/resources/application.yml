@@ -1,12 +1,12 @@
 #Server
 server:
   servlet:
-    context-path: /lightmin-client
+    context-path:
 spring:
   main:
     allow-bean-definition-overriding: true
   application:
-    name: lightmin-client
+    name: worker
   #ligtmin
   batch:
     job:
@@ -20,7 +20,7 @@ spring:
           batchtasks: http://localhost:${server.port}/batchtasks
         classic:
           server:
-            url: http://localhost:50100/lightmin-server
+            url: http://localhost:50101/
         client:
           publish-job-events: true
       batch:

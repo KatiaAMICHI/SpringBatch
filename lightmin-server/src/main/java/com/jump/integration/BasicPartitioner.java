@@ -14,14 +14,15 @@ import java.util.Map;
 @Configuration
 public class BasicPartitioner extends SimplePartitioner {
 
-	private static final String PARTITION_KEY = "partition";
+	private static final String PARTITION_KEY = "path";
 
 	@Override
 	public Map<String, ExecutionContext> partition(int gridSize) {
 		Map<String, ExecutionContext> partitions = super.partition(gridSize);
 		int i = 0;
 		for (ExecutionContext context : partitions.values()) {
-			context.put(PARTITION_KEY, PARTITION_KEY + (i++));
+			String locUrl = "http://localhost:50101/asset/get?parLabel=";
+			context.put(PARTITION_KEY, locUrl);
 		}
 		return partitions;
 	}

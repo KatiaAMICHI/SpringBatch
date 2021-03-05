@@ -1,5 +1,7 @@
 package com.jump;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import org.apache.activemq.broker.BrokerService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +18,13 @@ import javax.annotation.PostConstruct;
 @EnableLightminServer
 @EnableScheduling
 @EnableLightminJdbcConfigurationRepository
+@OpenAPIDefinition(
+        info = @Info(
+                title = "API REST V3",
+                version = "v0",
+                description = "app REST APIs V3"
+        )
+)
 public class LightminServer {
     @Value("${broker.url}")
     private String brokerUrl;

@@ -18,8 +18,8 @@ public class InterceptingJobExecution implements JobExecutionListener {
     @Override
     public void beforeJob(JobExecution jobExecution) {
         log.info("Intercepting Job Excution - Before Job!");
+        startJob();
     }
-
 
     private void startJob() {
         log.info("[InterceptingJobExecution] ....... startJob");

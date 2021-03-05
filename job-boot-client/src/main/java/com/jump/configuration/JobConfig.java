@@ -1,5 +1,6 @@
 package com.jump.configuration;
 
+import com.jump.domain.Asset;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -15,6 +16,13 @@ import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 
 @Configuration
 @IntegrationComponentScan
@@ -44,15 +52,25 @@ public class JobConfig {
 
     @Bean
     @StepScope
-    public Tasklet tasklet(@Value("#{stepExecutionContext['partition']}") String partition) {
+    public Tasklet tasklet(@Value("#{stepExecutionContext['path']}") final String path) {
         return (contribution, chunkContext) -> {
-            System.out.println("processing " + partition);
-            log.info("[Worker]... processing " + partition);
+            System.out.println("processing " + path);
+            final String locParameter = (String) chunkContext.getStepContext().getJobParameters().get("value");
+            Asset locResult = getResult(path + locParameter);
+            log.info("[Worker] read, result : " + locResult);
             // Thread.sleep(9000);
-            outboudChannel.send(new GenericMessage<>("send message from Worker : " + partition));
+            outboudChannel.send(new GenericMessage<>("send message from Worker, result : " + locResult));
             // Thread.sleep(9000);
             return RepeatStatus.FINISHED;
         };
+    }
+
+    public Asset getResult(final String parUrl) {
+        // String serverString = "http://localhost:50101/asset/get?parLabel=asset_label";
+        RestTemplate restTemplate = new RestTemplate();
+        Asset result = restTemplate.getForObject(parUrl, Asset.class);
+
+        return result;
     }
 
 
