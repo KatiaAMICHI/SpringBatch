@@ -1,7 +1,8 @@
-package com.jump.configuration;
+package com.jump.jobs;
 
 import com.jump.domain.Asset;
 import com.jump.integration.IntegrationGateway;
+import com.jump.jobs.CustomerItemReader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;

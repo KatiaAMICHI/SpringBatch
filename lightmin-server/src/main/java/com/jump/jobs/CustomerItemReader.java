@@ -1,4 +1,4 @@
-package com.jump.configuration;
+package com.jump.jobs;
 
 import com.jump.domain.Asset;
 import com.jump.domain.AssetKVRepository;

@@ -5,25 +5,23 @@
     <parent>
         <artifactId>SpringBatchLightmin</artifactId>
         <groupId>com.jump</groupId>
-        <version>2.1.0-SNAPSHOT</version>
+        <version>4.0.0.00.000-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>lightmin-server</artifactId>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.springframework.integration/spring-integration-jms -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.integration</groupId>
             <artifactId>spring-integration-jms</artifactId>
             <version>5.2.7.RELEASE</version>
         </dependency>
-        <!--dependency>
-            <groupId>org.springframework.integration</groupId>
-            <artifactId>spring-integration-amqp</artifactId>
-            <version>5.3.1.RELEASE</version>
-        </dependency-->
-        <!-- https://mvnrepository.com/artifact/org.springframework.integration.samples/ws-outbound-gateway -->
         <dependency>
             <groupId>org.springframework.integration</groupId>
             <artifactId>spring-integration-http</artifactId>
@@ -51,21 +49,13 @@
             <groupId>org.tuxdevelop</groupId>
             <artifactId>spring-batch-lightmin-repository-server</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-commons</artifactId>
-        </dependency>
         <!--datafactory -->
         <dependency>
             <groupId>org.fluttercode.datafactory</groupId>
             <artifactId>datafactory</artifactId>
             <version>${datafactory.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-commons</artifactId>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.tuxdevelop/spring-batch-lightmin-server-cluster-infinispan -->
+
         <dependency>
             <groupId>org.tuxdevelop</groupId>
             <artifactId>spring-batch-lightmin-server-cluster-infinispan</artifactId>
