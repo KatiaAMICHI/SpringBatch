@@ -1,4 +1,4 @@
-package jump.com.domain;
+package com.jump.objects.asset;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,12 +9,14 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 
-@Entity @Table(name = "simple_asset")
+@Entity
+@Table(name = "simple_asset")
 @Data
 @NoArgsConstructor
 public final class Asset implements Serializable {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @org.springframework.data.annotation.Id
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) @org.springframework.data.annotation.Id
     private Long id;
 
     @NotBlank

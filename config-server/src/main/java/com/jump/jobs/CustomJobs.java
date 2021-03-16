@@ -1,28 +1,20 @@
-package jump.com.jobs;
+package com.jump.jobs;
 
-import jump.com.task.AppendingCommandLineArgsProvider;
+//import com.jump.task.AppendingCommandLineArgsProvider;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.partition.PartitionHandler;
-import org.springframework.batch.core.partition.support.MultiResourcePartitioner;
-import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.cloud.deployer.spi.task.TaskLauncher;
-import org.springframework.cloud.task.batch.partition.CommandLineArgsProvider;
-import org.springframework.cloud.task.batch.partition.DeployerPartitionHandler;
-import org.springframework.cloud.task.batch.partition.NoOpEnvironmentVariablesProvider;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+//import org.springframework.cloud.deployer.spi.task.TaskLauncher;
 
 
 @Configuration
@@ -49,7 +41,7 @@ public class CustomJobs {
 		partitioner.setResources(resources);
 
 		return partitioner;
-	}*/
+	}
 
 	@Bean
 	public AppendingCommandLineArgsProvider commandLineArgsProvider() {
@@ -65,7 +57,7 @@ public class CustomJobs {
 		return provider;
 	}
 
-	/*@Bean
+	@Bean
 	public DeployerPartitionHandler partitionHandler(
 			final TaskLauncher taskLauncher,
 			final JobExplorer jobExplorer,
