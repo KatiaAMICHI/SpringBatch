@@ -1,4 +1,4 @@
-package jump.com.task;
+package com.jump.task;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.cloud.task.batch.partition.CommandLineArgsProvider;

@@ -9,10 +9,8 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 
-@Entity
-@Table(name = "simple_asset")
-@Data
-@NoArgsConstructor
+@Entity @Table(name = "simple_asset")
+@Data @NoArgsConstructor
 public final class Asset implements Serializable {
 
     @Id

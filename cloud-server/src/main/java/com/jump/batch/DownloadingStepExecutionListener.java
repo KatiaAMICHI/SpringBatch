@@ -1,4 +1,4 @@
-package jump.com.batch;
+package com.jump.batch;
 
 import lombok.extern.slf4j.Slf4j;
 
