@@ -17,7 +17,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 
 @Configuration
-@Slf4j
 public class JobConfiguration {
 
     @Bean

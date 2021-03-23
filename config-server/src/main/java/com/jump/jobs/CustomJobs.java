@@ -17,7 +17,7 @@ import java.util.List;
 //import org.springframework.cloud.deployer.spi.task.TaskLauncher;
 
 
-@Configuration
+//@Configuration
 public class CustomJobs {
 
 	@Autowired

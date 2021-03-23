@@ -3,29 +3,22 @@ package com.jump;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.springframework.cloud.task.configuration.EnableTask;
 import org.springframework.data.hazelcast.repository.config.EnableHazelcastRepositories;
-import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import javax.persistence.EntityManagerFactory;
 
 
 @SpringBootApplication
-@EnableTransactionManagement
-@EnableHazelcastRepositories(basePackages = { "com.jump.database.objects" })
 @EnableBatchProcessing
-//@EnableTask
-//@EnableDataFlowServer
+@EnableTask
+@EnableTransactionManagement
+@EnableHazelcastRepositories(basePackages = { "com.jump.objects" })
+@EnableJpaRepositories(basePackages = {"com.jump.objects"})
 public class ConfigServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ConfigServerApplication.class, args);
-	}
-
-	@Bean
-	public JpaTransactionManager transactionManager(EntityManagerFactory emf) {
-		return new JpaTransactionManager(emf);
 	}
 
 }

@@ -1,7 +1,10 @@
-"# SpringBatchLightmin" 
+"# Spring batch + spring cloud dataflow" 
 
-* Server : 
--Dserver.port=50103 
+> task.server_task=maven://com.jump:config-server:4.0.0.00.000-SNAPSHOT
+> source.server_source=maven://com.jump:config-server:4.0.0.00.000-SNAPSHOT
+> processor.worker_processor=maven://com.jump:worker-service:4.0.0.00.000-SNAPSHOT
 
-* client : 
--Dserver.port=9012 
+
+task.server_task=maven://com.jump:config-server:4.0.0.00.000-SNAPSHOT
+source.server_source=maven://com.jump:config-server:4.0.0.00.000-SNAPSHOT
+processor.worker_processor=maven://com.jump:worker-service:4.0.0.00.000-SNAPSHOT

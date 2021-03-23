@@ -5,17 +5,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-import java.beans.PropertyVetoException;
-import java.net.URISyntaxException;
+
 
 @Configuration
 public class BDConfiguration {
@@ -42,10 +38,11 @@ public class BDConfiguration {
         return locBuild;
     }
 
-    /*@Bean
+    @Bean
+    @Primary
     public PlatformTransactionManager dataSourceTransactionManager(final DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
-    }*/
+    }
 
     @Bean
     public JdbcTemplate jdbcTemplate(final DataSource dataSource) {

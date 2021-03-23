@@ -9,20 +9,19 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class AssetController {
 
-    //@Autowired
-    //private AssetKVRepository _repository;
+    @Autowired
+    private AssetKVRepository _repository;
 
     @GetMapping("/get")
     public Asset getByLabel(final String parLabel) {
         log.info("try to get Asset by label");
-        return null;
-      //  return _repository.getByLabel(parLabel);
+        return _repository.getByLabel(parLabel);
     }
 
     @PostMapping("/update")
     public Asset updateLabel(final String parLabel, final String parNewLabel) {
         log.info("try to update Asset with new label");
-        final Asset locAsset = null; //_repository.getByLabel(parLabel);
+        final Asset locAsset = _repository.getByLabel(parLabel);
         locAsset.setLabel(parNewLabel);
         return locAsset;
     }
@@ -32,8 +31,11 @@ public class AssetController {
         log.info("try to update Asset with new label");
         final Asset locAsset = new Asset();
         locAsset.setLabel(parLabel);
-        //return _repository.save(locAsset);
-        return null;
+        return _repository.save(locAsset);
     }
 
+    public void makeAWish(Object obj) {
+        log.info(" [ AssetController ] do samthing ....., obj : " + obj);
+        // return new Wish(toy, "Wawwww, this toy is wonderful! Santa please bring it " + "to me.");
+    }
 }
