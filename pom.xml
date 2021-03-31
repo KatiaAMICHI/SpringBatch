@@ -42,42 +42,40 @@
                 <version>${spring-boot.version}</version>
             </dependency>
 
-            <!--dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency-->
-
             <!-- spring cloud -->
 
-            <dependency>
+            <!--dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-dataflow-server</artifactId>
                 <version>2.3.1.RELEASE</version>
-                <!--version>2.4.2.RELEASE</version-->
+                <version>2.4.2.RELEASE</version>
+            </dependency-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-task-dependencies</artifactId>
+                <version>2.3.1-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
-
+            <!--dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-stream-dependencies</artifactId>
+                <version>Horsham.SR5</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency-->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>Hoxton.SR5</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-config</artifactId>
-                <version>2.2.4.RELEASE</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-task-core</artifactId>
-                <version>2.2.3.RELEASE</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-task-batch</artifactId>
-                <version>2.2.3.RELEASE</version>
+                <exclusions>
+                    <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                        <artifactId>org.springframework.cloud:spring-cloud-task-dependencies:2.2.3.RELEASE</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Spring Batch -->
@@ -104,6 +102,12 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.cloud</groupId>
+                        <artifactId>org.springframework.cloud:spring-cloud-task-dependencies:2.2.3.RELEASE</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -124,22 +128,6 @@
                 <version>1.2.32</version>
             </dependency>
 
-            <!--dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-skipper-server</artifactId>
-                <version>2.6.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${jackson.version}</version>
-            </dependency-->
-
             <dependency>
                 <groupId>org.mariadb.jdbc</groupId>
                 <artifactId>mariadb-java-client</artifactId>
@@ -156,6 +144,9 @@
                 <artifactId>spring-boot-autoconfigure</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
+
+
+
         </dependencies>
 
     </dependencyManagement>

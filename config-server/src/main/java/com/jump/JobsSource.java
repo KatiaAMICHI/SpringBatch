@@ -2,14 +2,18 @@ package com.jump;
 
 
 import com.jump.objects.JobEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Source;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.GenericMessage;
 
 @EnableBinding(Source.class)
+@Slf4j
 public class JobsSource {
   @Autowired
   private Source source;
@@ -24,7 +28,21 @@ public class JobsSource {
   }*/
 
   public void send(StepContribution contribution, ChunkContext chunkContext) {
-    final JobEvent event = new JobEvent(contribution, chunkContext);
-    source.output().send(MessageBuilder.withPayload(event).build());
+
+    Message<ChunkContext> msg = new GenericMessage<>(chunkContext);
+    log.info("msg to send : " + msg);
+    source.output().send(msg);
+
+    //source.output().send(MessageBuilder.withPayload(event).build());
+  }
+
+
+  public void send(StepExecution stepExecution) {
+
+    Message<StepExecution> msg = new GenericMessage<>(stepExecution);
+    log.info("msg to send : " + msg);
+    source.output().send(msg);
+
+    //source.output().send(MessageBuilder.withPayload(event).build());
   }
 }

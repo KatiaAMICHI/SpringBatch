@@ -13,13 +13,13 @@ public class AssetController {
     private AssetKVRepository _repository;
 
     @GetMapping("/get")
-    public Asset getByLabel(final String parLabel) {
+    public Asset getByLabel(@PathVariable(value = "label") final String parLabel) {
         log.info("try to get Asset by label");
         return _repository.getByLabel(parLabel);
     }
 
     @PostMapping("/update")
-    public Asset updateLabel(final String parLabel, final String parNewLabel) {
+    public Asset updateLabel(@PathVariable(value = "label") final String parLabel, @PathVariable(value = "newlabel") final String parNewLabel) {
         log.info("try to update Asset with new label");
         final Asset locAsset = _repository.getByLabel(parLabel);
         locAsset.setLabel(parNewLabel);
@@ -27,7 +27,7 @@ public class AssetController {
     }
 
     @PutMapping("/add")
-    public Asset addAsset(final String parLabel) {
+    public Asset addAsset(@PathVariable(value = "label") final String parLabel) {
         log.info("try to update Asset with new label");
         final Asset locAsset = new Asset();
         locAsset.setLabel(parLabel);
