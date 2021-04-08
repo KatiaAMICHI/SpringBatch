@@ -1,8 +1,8 @@
 package com.jump.jobs;
 
-import com.jump.JobsSource;
 import com.jump.objects.JobEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
@@ -17,6 +17,7 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.annotation.InboundChannelAdapter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
@@ -31,8 +32,6 @@ public class AssetJobConfiguration {
   public JobBuilderFactory jobBuilderFactory;
   @Autowired
   public StepBuilderFactory stepBuilderFactory;
-  @Autowired
-  public JobsSource jobsSource;
   @Autowired
   private Source sources;
 
@@ -58,21 +57,23 @@ public class AssetJobConfiguration {
             @Override
             public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
 
-                // soucis avec deserializing du JobParameter quand le worker reçoit le message
+                // soucis avec la deserializing du JobParameter quand le worker reçoit le message
                 final Map<String, Object> parameters =
                         stepContribution.getStepExecution().getJobParameters().getParameters()
                                         .entrySet().stream()
                                         .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
+                long jobId = chunkContext.getStepContext().getStepExecution().getJobExecution().getJobId();
+                final BatchStatus status = chunkContext.getStepContext().getStepExecution().getJobExecution().getStatus();
 
-                final String path = "http://localhost:8888/asset/get?value=" + parameters.get("value");
+                final String path = "http://localhost:1111/asset/get?label=" + parameters.get("value");
 
-                final JobEvent payload = new JobEvent(parameters, path);
+                final JobEvent payload = new JobEvent(jobId, parameters, path, status);
                 final Message<JobEvent> partitionKey = MessageBuilder.withPayload(payload)
                                                                      .setHeader("partitionKey", payload)
                                                                      .build();
                 source.output().send(partitionKey);
 
-                return RepeatStatus.FINISHED;
+                return RepeatStatus.CONTINUABLE;
             }
         };
     }

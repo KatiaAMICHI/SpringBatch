@@ -1,4 +1,4 @@
-package com.jump;
+package com.jump.objects.configs;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 
 
 @Configuration
-public class BDConfiguration {
+public class BdConfiguration {
     @Value("${spring.datasource.password}")
     private String password;
     @Value("${spring.datasource.username}")
@@ -40,7 +40,7 @@ public class BDConfiguration {
 
     @Bean
     @Primary
-    public PlatformTransactionManager transactionManager(final DataSource dataSource) {
+    public PlatformTransactionManager dataSourceTransactionManager(final DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
 

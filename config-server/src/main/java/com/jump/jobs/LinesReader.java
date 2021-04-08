@@ -20,7 +20,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@EnableBinding(Source.class)
 @Slf4j
 @AllArgsConstructor
 public class LinesReader implements Tasklet, StepExecutionListener {
@@ -45,7 +44,7 @@ public class LinesReader implements Tasklet, StepExecutionListener {
 
         final String path = "http://localhost:8888/asset";
 
-        final JobEvent payload = new JobEvent(parameters, path);
+        final JobEvent payload = new JobEvent(null, parameters, path, null);
         final Message<JobEvent> partitionKey = MessageBuilder.withPayload(payload)
                                                              .setHeader("partitionKey", payload)
                                                              .build();
@@ -60,7 +59,7 @@ public class LinesReader implements Tasklet, StepExecutionListener {
         return ExitStatus.COMPLETED;
     }
 
-    @InboundChannelAdapter(channel = Source.OUTPUT, autoStartup= "false")
+    //@InboundChannelAdapter(channel = Source.OUTPUT, autoStartup= "false")
     public Message<?> generate() {
         String value = "data";
         System.out.println("Sending: " + value);

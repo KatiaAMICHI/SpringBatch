@@ -11,6 +11,7 @@ import org.springframework.cloud.task.configuration.EnableTask;
 public class WorkerServiceApplication {
 
 	public static void main(String[] args) {
+		// notifToServer();
 		SpringApplication.run(WorkerServiceApplication.class, args);
 	}
 }
