@@ -48,6 +48,7 @@ public class BDConfiguration {
     public JdbcTemplate jdbcTemplate(final DataSource dataSource) {
         final JdbcTemplate jdbcTemplate = new JdbcTemplate();
         jdbcTemplate.setDataSource(dataSource);
+        //jdbcTemplate.afterPropertiesSet();
         return jdbcTemplate;
     }
 }

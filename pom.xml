@@ -11,7 +11,6 @@
     <version>4.0.0.00.000-SNAPSHOT</version>
 
     <modules>
-        <module>dataflow-server</module>
         <module>config-server</module>
         <module>worker-service</module>
         <module>domain</module>

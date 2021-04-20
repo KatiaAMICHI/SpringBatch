@@ -1,0 +1,27 @@
+---
+spring:
+  profiles: instance1
+  cloud:
+    stream:
+      instanceCount: 3
+      instanceIndex: 0
+server:
+  port: ${PORT:9901}
+---
+spring:
+  profiles: instance2
+  cloud:
+    stream:
+      instanceCount: 3
+      instanceIndex: 1
+server:
+  port: ${PORT:9902}
+---
+spring:
+  profiles: instance3
+  cloud:
+    stream:
+      instanceCount: 3
+      instanceIndex: 2
+server:
+  port: ${PORT:9903}
