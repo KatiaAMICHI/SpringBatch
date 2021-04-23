@@ -40,14 +40,14 @@ public class BDConfiguration {
 
     @Bean
     @Primary
-    public PlatformTransactionManager dataSourceTransactionManager(final DataSource dataSource) {
-        return new DataSourceTransactionManager(dataSource);
+    public PlatformTransactionManager dataSourceTransactionManager(final DataSource parDataSource) {
+        return new DataSourceTransactionManager(parDataSource);
     }
 
     @Bean
-    public JdbcTemplate jdbcTemplate(final DataSource dataSource) {
+    public JdbcTemplate jdbcTemplate(final DataSource parDataSource) {
         final JdbcTemplate jdbcTemplate = new JdbcTemplate();
-        jdbcTemplate.setDataSource(dataSource);
+        jdbcTemplate.setDataSource(parDataSource);
         //jdbcTemplate.afterPropertiesSet();
         return jdbcTemplate;
     }

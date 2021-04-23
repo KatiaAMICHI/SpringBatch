@@ -8,8 +8,6 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.autoconfigure.session.SessionAutoConfiguration;
 import org.springframework.cloud.task.configuration.EnableTask;
-import org.springframework.data.hazelcast.repository.config.EnableHazelcastRepositories;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
@@ -23,8 +21,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableBatchProcessing
 @EnableTask
 @EnableTransactionManagement
-@EnableHazelcastRepositories(basePackages = { "com.jump.objects" })
-@EnableJpaRepositories(basePackages = {"com.jump.objects"})
 public class ConfigServerApplication {
 
 	public static void main(String[] args) {

@@ -35,42 +35,50 @@ public class JobConfiguration {
     public JobRegistryBeanPostProcessor jobRepositoryBeanProcessor() throws Exception {
         final JobRegistryBeanPostProcessor locPostProcessor = new JobRegistryBeanPostProcessor();
         locPostProcessor.setJobRegistry(jobRegistry);
-        //locPostProcessor.afterPropertiesSet();
+        locPostProcessor.afterPropertiesSet();
 
         return locPostProcessor;
     }
 
     @Bean
-    public JobOperator jobOperator() throws Exception {
+    public JobOperator jobOperator() {
         final SimpleJobOperator jobOperator = new SimpleJobOperator();
         jobOperator.setJobLauncher(jobLauncher);
         jobOperator.setJobRepository(jobRepository);
         jobOperator.setJobRegistry(jobRegistry);
         jobOperator.setJobExplorer(jobExplorer);
-        //jobOperator.afterPropertiesSet();
         return jobOperator;
     }
 
     @Bean
-    public JdbcOperations jdbcOperations(final DataSource dataSource) throws Exception {
-        return new JdbcTemplate(dataSource);
+    public JdbcOperations jdbcOperations(final DataSource parDataSource) {
+        return new JdbcTemplate(parDataSource);
     }
 
     @Bean
-    public JobExplorer jobExplorer(final DataSource dataSource) throws Exception {
+    public JobExplorer jobExplorer(final DataSource parDataSource) throws Exception {
         final JobExplorerFactoryBean bean = new JobExplorerFactoryBean();
-        bean.setDataSource(dataSource);
+        bean.setDataSource(parDataSource);
         bean.setTablePrefix("BATCH_");
-        bean.setJdbcOperations(new JdbcTemplate(dataSource));
+        bean.setJdbcOperations(new JdbcTemplate(parDataSource));
         bean.afterPropertiesSet();
         return bean.getObject();
     }
 
     @Bean
-    public JobLauncher jobLauncher() throws Exception {
-        final SimpleJobLauncher launcher = new SimpleJobLauncher();
-        launcher.setJobRepository(jobRepository);
-        //launcher.afterPropertiesSet();
-        return launcher;
+    public JobLauncher jobLauncher() {
+        final SimpleJobLauncher locLauncher = new SimpleJobLauncher();
+        locLauncher.setJobRepository(jobRepository);
+        return locLauncher;
+    }
+
+    @Bean
+    protected JobRepository createJobRepository(final DataSource dataSource, final PlatformTransactionManager transactionManager) throws Exception {
+        final JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+        factory.setDataSource(dataSource);
+        factory.setTransactionManager(transactionManager);
+        factory.setIsolationLevelForCreate("ISOLATION_READ_UNCOMMITTED");
+        factory.afterPropertiesSet();
+        return factory.getObject();
     }
 }

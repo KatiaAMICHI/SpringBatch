@@ -1,13 +1,11 @@
 package com.jump;
 
-import com.jump.jobs.configs.InterceptingJobExecution;
+import com.jump.jobs.configs.CustomJdbcJobExecutionDao;
+import com.jump.jobs.configs.JobExecutionService;
 import com.jump.objects.JobEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -29,8 +27,6 @@ public class ReceiveStatus {
     @Autowired
     private JobExplorer jobExplorer;
     @Autowired
-    private JobOperator jobOperator;
-    @Autowired
     private JobRepository jobRepository;
     @Autowired
     private JdbcOperations jdbcOperations;
@@ -41,8 +37,33 @@ public class ReceiveStatus {
 
     @SneakyThrows
     @StreamListener(Sink.INPUT)
-    public void receiveStatusOrange(JobEvent msg) {
-       // input.subscribe(output);
-       log.info("[Server] I received a message. {}", msg);
+    public void receiveStatusOrange(final JobEvent parMsg) {
+        log.info("[Server] I received a message. {}", parMsg);
+        final JobExecution locJobExecution = jobExplorer.getJobExecution(parMsg.getJobExecutionId());
+        assert locJobExecution != null;
+        if (locJobExecution.getExitStatus().equals(ExitStatus.COMPLETED)) {
+            return;
+        }
+        locJobExecution.setExitStatus(new ExitStatus(parMsg.getExitStatus()));
+        jobRepository.update(locJobExecution);
+        log.info("[Server] Update status JobExecution : {}", locJobExecution);
+
+        // start next job (if present) with same name
+
+        final CustomJdbcJobExecutionDao customJdbcJobExecutionDao = new CustomJdbcJobExecutionDao(jdbcOperations);
+        final List<JobExecution> locLatestRunningJobs = customJdbcJobExecutionDao.getRunningJobExecutionsWithParams(locJobExecution.getId(), locJobExecution.getJobInstance().getJobName(), locJobExecution.getJobParameters());
+
+        if (!locLatestRunningJobs.isEmpty()) {
+            final JobExecutionService locJobExecutionService = new JobExecutionService(jobRepository, jobRegistry, jobLauncher);
+
+            final JobExecution locLatestRunningJob = locJobExecutionService.getFirstJobExecutioin(locLatestRunningJobs, null);
+            final Long locNewJobExectionId = locJobExecutionService.restartJob(locLatestRunningJob);
+            log.info("[Server] create new JobExection with id : {}", locNewJobExectionId);
+        }
     }
+
+
+
+
+
 }

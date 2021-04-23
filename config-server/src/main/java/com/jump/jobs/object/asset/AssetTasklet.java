@@ -20,22 +20,22 @@ public class AssetTasklet implements Tasklet, StepExecutionListener {
     private final Source source;
 
     @Override
-    public void beforeStep(StepExecution stepExecution) {
+    public void beforeStep(final StepExecution parStepExecution) {
         log.debug("Assettasket initialized");
     }
 
     @Override
-    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
+    public RepeatStatus execute(final StepContribution parStepContribution, final ChunkContext parChunkContext) {
 
         // soucis avec la deserializing du JobParameter quand le worker reçoit le message
         final Map<String, Object> parameters =
-                stepContribution.getStepExecution().getJobParameters().getParameters()
+                parStepContribution.getStepExecution().getJobParameters().getParameters()
                                 .entrySet().stream()
                                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
-        long jobId = chunkContext.getStepContext().getStepExecution().getJobExecution().getJobId();
-        final BatchStatus status = chunkContext.getStepContext().getStepExecution().getJobExecution().getStatus();
+        long jobId = parChunkContext.getStepContext().getStepExecution().getJobExecution().getJobId();
+        final BatchStatus status = parChunkContext.getStepContext().getStepExecution().getJobExecution().getStatus();
 
-        final Long jobExecutionId = chunkContext.getStepContext().getStepExecution().getJobExecution().getId();
+        final Long jobExecutionId = parChunkContext.getStepContext().getStepExecution().getJobExecution().getId();
         final String path = "http://localhost:1111/asset/get?label=" + parameters.get("value");
 
         final JobEvent payload = new JobEvent(jobId, jobExecutionId, parameters, path, status, "UNKNOWN");
@@ -48,7 +48,7 @@ public class AssetTasklet implements Tasklet, StepExecutionListener {
     }
 
     @Override
-    public ExitStatus afterStep(StepExecution stepExecution) {
+    public ExitStatus afterStep(final StepExecution parStepExecution) {
         log.debug("Job executing in remote server");
         return ExitStatus.UNKNOWN;
     }
