@@ -19,11 +19,9 @@ public class AssetJobProcessor {
 
     @StreamListener(Processor.INPUT) @SendTo(Processor.OUTPUT)
     public JobEvent listen(@Payload final JobEvent in, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) final int parPartition) throws InterruptedException {
-        log.info("[Worker] received message - sleep 10000 (10 s)");
-        Thread.sleep(20000);
-        log.info("[InterceptingJobExecution] ....... running | end sleep 50000 >> 10 second");
-        //Thread.sleep(10000);
         log.info("[Worker] received message : " + in + ", from partition " + parPartition);
+        Thread.sleep(20000);
+        log.info("[Worker] received message - end sleep 10 s");
         final Asset locResult = getResult(in.getPath());
 
         log.info("[Worker] result : " + locResult);

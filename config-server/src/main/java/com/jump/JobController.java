@@ -21,11 +21,11 @@ public class JobController {
     @Autowired @Qualifier("jobasset")
     private Job job;
 
-    @RequestMapping("/startjob1")
-    public String startJob1(@RequestParam(value = "label") final String parLabel, @RequestParam(value = "index") final int parIndex) throws InterruptedException {
+    @RequestMapping("/startjobs")
+    public String startJobs(@RequestParam(value = "label") final String parLabel, @RequestParam(value = "index") final int parIndex) throws InterruptedException {
         log.info("runnig job with label value : " + parLabel);
         for (int locIndex = 0; locIndex<parIndex; locIndex++) {
-            Thread.sleep(5000);
+            Thread.sleep(2000);
             runJobB(this.job, parLabel + locIndex);
         }
         return "status";
