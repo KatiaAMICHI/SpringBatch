@@ -6,17 +6,11 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.lang.Nullable;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +32,6 @@ public class InterceptingJobExecution implements JobExecutionListener {
     @SneakyThrows
     @Override
     public void afterJob(final JobExecution parJobExecution) {
-        log.info("[InterceptingJobExecution] ....... afterJob");
     }
 
     @SneakyThrows
@@ -55,12 +48,12 @@ public class InterceptingJobExecution implements JobExecutionListener {
             return null;
         } else if (null != (locJobExecutioin = locJobExecutionService.containtCompletedStatus(locLatestRunningJobs))) {
             final Long locJobExecutionID = locJobExecutioin.getId();
-            log.info("Job with id %d already running with same parameter.", locJobExecutionID);
+            log.info("Job with id %d already running with same parameter {}", locJobExecutionID);
             // job with the same parameter is running, we stop the new job we are trying to execute
             stopJpb(parJobExecution);
             return locJobExecutionID;
         } else if ( null != (locJobExecutioin = locJobExecutionService.getFirstJobExecutioin(locLatestRunningJobs, parJobExecution.getJobParameters()))) {
-            log.info("job with id %d must be executed in first", locJobExecutioin.getId());
+            log.info("job with id %d must be executed in first : {} ", locJobExecutioin.getId());
             // récupere le plus anciaens job a execution et stopper celui accutelle
             stopJpb(parJobExecution);
             // restart locJobExecutioin

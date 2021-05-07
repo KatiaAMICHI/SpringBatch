@@ -1,38 +1,59 @@
 package com.jump;
 
-import com.jump.objects.JobEvent;
+import com.jump.objects.jobObject.JobEvent;
 import com.jump.objects.asset.Asset;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.client.RestTemplate;
 
 @EnableBinding(Processor.class)
 @Slf4j
 public class AssetJobProcessor {
 
-    @StreamListener(Processor.INPUT) @SendTo(Processor.OUTPUT)
-    public JobEvent listen(@Payload final JobEvent in, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) final int parPartition) throws InterruptedException {
-        log.info("[Worker] received message : " + in + ", from partition " + parPartition);
-        Thread.sleep(20000);
+    @Autowired
+    private Processor processor;
+
+    @StreamListener(target = Processor.INPUT, condition = "headers['custom_info']=='processing'")
+    public void listenInfos(final Message<JobEvent> parMsg) throws InterruptedException {
+        final JobEvent in = parMsg.getPayload();
+        final int parPartition = (int)parMsg.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION_ID);
+        log.info("[Worker PROCESSING] received message : " + in + ", from partition : " + parPartition);
+    }
+
+    @StreamListener(target = Processor.INPUT, condition = "headers['custom_info']=='start'")
+    public void listenStart(final Message<JobEvent> parMsg) throws InterruptedException {
+        final JobEvent in = parMsg.getPayload();
+        final int locPartition = (int)parMsg.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION_ID);
+        log.info("[Worker START] received message : " + in + ", from partition : " + locPartition);
+
+        // envoyer un message d'avancement
+         Message<JobEvent> partitionKey = MessageBuilder.withPayload(in)
+                                                        .setHeader("custom_info", "infos")
+                                                        .setHeader("worker_partition", locPartition)
+                                                        .build();
+        processor.output().send(partitionKey);
+        Thread.sleep(30000);
         log.info("[Worker] received message - end sleep 10 s");
         final Asset locResult = getResult(in.getPath());
-
-        log.info("[Worker] result : " + locResult);
 
         in.setStatus(BatchStatus.COMPLETED);
         in.setExitStatus("COMPLETED");
 
-        return in;
+        partitionKey = MessageBuilder.withPayload(in)
+                                     .setHeader("custom_info", "end")
+                                     .build();
+        log.info("[Worker START] sendding message to MASTER SERVER");
+        processor.output().send(partitionKey);
     }
 
-    public Asset getResult(final String parUrl) {
+    private Asset getResult(final String parUrl) {
         final RestTemplate restTemplate = new RestTemplate();
         return restTemplate.getForObject(parUrl, Asset.class);
     }

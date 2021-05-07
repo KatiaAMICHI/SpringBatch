@@ -1,4 +1,4 @@
-package com.jump.objects;
+package com.jump;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package com.jump.objects.configs;
+package com.jump.configs;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;

@@ -63,7 +63,6 @@ public class CustomJdbcJobExecutionDao extends JdbcJobExecutionDao {
         private JobInstance jobInstanceMapRow(final ResultSet parResultSet) throws SQLException {
             final JobInstance locJobInstance = new JobInstance(parResultSet.getLong(10), parResultSet.getString(12));
             locJobInstance.setVersion(parResultSet.getInt(13));
-            //locJobInstance.incrementVersion();
             return locJobInstance;
         }
 

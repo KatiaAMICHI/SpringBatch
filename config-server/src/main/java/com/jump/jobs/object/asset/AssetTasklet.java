@@ -1,7 +1,7 @@
 package com.jump.jobs.object.asset;
 
-import com.jump.objects.JobEvent;
-import lombok.AllArgsConstructor;
+import com.jump.objects.jobObject.JobEvent;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AssetTasklet implements Tasklet, StepExecutionListener {
     private final Source source;
 
@@ -38,9 +38,9 @@ public class AssetTasklet implements Tasklet, StepExecutionListener {
         final Long jobExecutionId = parChunkContext.getStepContext().getStepExecution().getJobExecution().getId();
         final String path = "http://localhost:1111/asset/get?label=" + parameters.get("value");
 
-        final JobEvent payload = new JobEvent(jobId, jobExecutionId, parameters, path, status, "UNKNOWN");
+        final JobEvent payload = new JobEvent(jobId, jobExecutionId, parameters, path, status, "UNKNOWN", null);
         final Message<JobEvent> partitionKey = MessageBuilder.withPayload(payload)
-                                                             .setHeader("partitionKey", payload)
+                                                             .setHeader("custom_info", "start")
                                                              .build();
         source.output().send(partitionKey);
 
