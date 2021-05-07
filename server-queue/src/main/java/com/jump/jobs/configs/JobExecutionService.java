@@ -32,7 +32,7 @@ public class JobExecutionService {
 
     @SneakyThrows
     public Long restartJob(final JobExecution parFirstJobExecution) {
-        synchronized (parFirstJobExecution) {
+        synchronized (parFirstJobExecution.getId()) {
             log.info("Checking status of job execution with id=" + parFirstJobExecution.getId());
             String jobName = parFirstJobExecution.getJobInstance().getJobName();
             final Job job = jobRegistry.getJob(jobName);

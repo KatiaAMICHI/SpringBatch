@@ -92,12 +92,8 @@ public class ReceiveStatus {
                 locJobExecution.getJobParameters());
 
         if (!locLatestRunningJobs.isEmpty()) {
-            final JobExecutionService locJobExecutionService = new JobExecutionService(jobRepository,
-                    jobRegistry,
-                    jobLauncher);
-
-            final JobExecution locLatestRunningJob = locJobExecutionService.getFirstJobExecutioin(locLatestRunningJobs,
-                    null);
+            final JobExecutionService locJobExecutionService = new JobExecutionService(jobRepository, jobRegistry, jobLauncher);
+            final JobExecution locLatestRunningJob = locJobExecutionService.getFirstJobExecutioin(locLatestRunningJobs, null);
             final Long locNewJobExectionId = locJobExecutionService.restartJob(locLatestRunningJob);
             log.info("[Server] create new JobExection with id : {}", locNewJobExectionId);
         }

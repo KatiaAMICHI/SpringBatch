@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 @EnableBinding(Processor.class)
 @Slf4j
-public class AssetJobProcessor {
+public class JobProcessor {
 
     @Autowired
     private Processor processor;

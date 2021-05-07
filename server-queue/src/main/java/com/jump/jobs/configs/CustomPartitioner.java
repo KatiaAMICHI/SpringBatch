@@ -16,8 +16,7 @@ public class CustomPartitioner extends DefaultPartitioner {
             partitionKey = String.valueOf(jobEvent.getChannelPartition());
             keyBytes = partitionKey.getBytes();
         }
-        final int partition = super.partition(topic, partitionKey, keyBytes, value, valueBytes, cluster);
-        return partition;
+        return super.partition(topic, partitionKey, keyBytes, value, valueBytes, cluster);
     }
 
     @Override

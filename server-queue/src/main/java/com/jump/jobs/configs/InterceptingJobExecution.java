@@ -64,7 +64,7 @@ public class InterceptingJobExecution implements JobExecutionListener {
     }
 
     private void stopJpb(final JobExecution parJobExecution) {
-        synchronized (parJobExecution) {
+        synchronized (parJobExecution.getId()) {
             parJobExecution.stop();
             jobRepository.update(parJobExecution);
         }
