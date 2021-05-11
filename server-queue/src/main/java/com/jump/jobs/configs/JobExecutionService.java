@@ -55,40 +55,40 @@ public class JobExecutionService {
     }
 
     public JobExecution getFirstJobExecutioin(final List<JobExecution> parJobExecutions, @Nullable final JobParameters parParamJobParameters) {
-        JobExecution latestExecution = null;
+        JobExecution locLatestExecution = null;
 
         if (parJobExecutions.isEmpty()) {
             return null;
         }
         final JobParameters locJobParameters;
         if (null == parParamJobParameters) {
-            latestExecution = parJobExecutions.get(0);
+            locLatestExecution = parJobExecutions.get(0);
             parJobExecutions.remove(0);
-            locJobParameters = latestExecution.getJobParameters();
+            locJobParameters = locLatestExecution.getJobParameters();
         } else {
             locJobParameters = parParamJobParameters;
         }
 
-        long minDiff = Long.MAX_VALUE;
-        for (final JobExecution execution : parJobExecutions) {
-            final JobParameters params = execution.getJobParameters();
+        long locMinDiffCreationT = Long.MAX_VALUE;
+        for (final JobExecution locExecution : parJobExecutions) {
+            final JobParameters locParams = locExecution.getJobParameters();
 
-            log.warn("params - value1 {}", params.getString("value"));
+            log.warn("locParams - value1 {}", locParams.getString("value"));
 
-            log.warn("create {}", execution.getCreateTime());
-            log.warn("start {}", execution.getStartTime());
+            log.warn("create {}", locExecution.getCreateTime());
+            log.warn("start {}", locExecution.getStartTime());
 
             final Long time = locJobParameters.getLong("time");
-            long diff = (null == time ? 0 : time) - execution.getCreateTime().getTime();
-            if (diff < 0) {
-                log.warn("Impossible, new job executed before old! Old JobExecution id: {}", execution.getJobId());
+            long locDiffCreationT = (null == time ? 0 : time) - locExecution.getCreateTime().getTime();
+            if (locDiffCreationT < 0) {
+                log.warn("Impossible, new job executed before old! Old JobExecution id: {}", locExecution.getJobId());
                 continue;
             }
-            if (diff < minDiff) {
-                minDiff = diff;
-                latestExecution = execution;
+            if (locDiffCreationT < locMinDiffCreationT) {
+                locMinDiffCreationT = locDiffCreationT;
+                locLatestExecution = locExecution;
             }
         }
-        return latestExecution;
+        return locLatestExecution;
     }
 }

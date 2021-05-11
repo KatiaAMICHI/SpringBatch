@@ -1,4 +1,4 @@
-package com.jump;
+package com.jump.jobs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -22,10 +22,10 @@ public class JobController {
     private Job job;
 
     @RequestMapping("/startjobs")
-    public String startJobs(@RequestParam(value = "label") final String parLabel, @RequestParam(value = "index") final int parIndex) throws InterruptedException {
+    public String startJobs(@RequestParam(value = "label") final String parLabel, @RequestParam(value = "index") final int parIndex) {
         log.info("runnig job with label value : " + parLabel);
         for (int locIndex = 0; locIndex<parIndex; locIndex++) {
-            Thread.sleep(2000);
+            //Thread.sleep(2000);
             runJobB(this.job, parLabel + locIndex);
         }
         return "status";
@@ -38,19 +38,20 @@ public class JobController {
         return "status";
     }
 
-    public void runJobB(final Job parJob, final String parLabel) {
+    public Long runJobB(final Job parJob, final String parLabel) {
         log.info("[Job] running ...........");
 
-        final JobParameters paramJobParameters = new JobParametersBuilder()
+        final JobParameters locParamJobParameters = new JobParametersBuilder()
                 .addParameter("value", new JobParameter(parLabel))
                 .addParameter("time", new JobParameter(System.currentTimeMillis()))
                 .toJobParameters();
 
         try {
-            jobLauncher.run(parJob, paramJobParameters);
+            return jobLauncher.run(parJob, locParamJobParameters).getId();
         } catch (Exception ex) {
             log.error("[RUN JOB] : " + ex.getMessage());
         }
+        return null;
     }
 
 }

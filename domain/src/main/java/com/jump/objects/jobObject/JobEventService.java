@@ -15,20 +15,20 @@ public class JobEventService {
 	@Autowired
 	private CacheClient cacheClient;
 	
-	@Cacheable(value="jobEvents", key="#jobEventId", unless = "#result==null")
-	public JobEvent getJobEventById(final Long jobEventId) {
-		return cacheClient.get(jobEventId);
+	@Cacheable(value="jobEvents", key="#parJobEventId", unless = "#result==null")
+	public JobEvent getJobEventById(final Long parJobEventId) {
+		return cacheClient.get(parJobEventId);
 	}
 
-	@CacheEvict(value="jobEvents", key="#jobEvent")
-	public JobEvent save(final JobEvent jobEvent) {
-		return cacheClient.put(jobEvent.getJobId(), jobEvent);
+	@CacheEvict(value="jobEvents", key="#parJobEvent")
+	public JobEvent save(final JobEvent parJobEvent) {
+		return cacheClient.put(parJobEvent.getJobId(), parJobEvent);
 	}
 
 	@CachePut(value="jobEvents")
-	public JobEvent setPartitonId(final Long jobEventId, final Integer parPartitionId) {
+	public JobEvent setPartitonId(final Long parJobEventId, final Integer parPartitionId) {
 		JobEvent updatedUser = null;
-		JobEvent userFromDB = cacheClient.get(jobEventId);
+		JobEvent userFromDB = cacheClient.get(parJobEventId);
 		if(userFromDB != null) {
 			userFromDB.setChannelPartition(parPartitionId);
 			updatedUser = cacheClient.put(userFromDB.getJobId(), userFromDB);

@@ -19,7 +19,8 @@ public class WorkerServiceApplication {
 
 	@Bean
 	@LoadBalanced
-	RestTemplate restTemplate() {
+	// a enlever !
+	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
 

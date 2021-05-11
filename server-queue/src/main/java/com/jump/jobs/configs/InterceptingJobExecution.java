@@ -24,9 +24,8 @@ public class InterceptingJobExecution implements JobExecutionListener {
     @SneakyThrows
     @Override
     public void beforeJob(final JobExecution parJobExecution) {
-        log.info("Intercepting Job Excution - Before Job!");
         final Long locJobExecutionId = startJob(parJobExecution);
-        log.info("Intercepting Job Excution - jobExecutionId restart : " + locJobExecutionId);
+        log.info("[Before Job] Intercepting Job Excution - jobExecutionId id : {} ", locJobExecutionId);
     }
 
     @SneakyThrows
@@ -36,28 +35,30 @@ public class InterceptingJobExecution implements JobExecutionListener {
 
     @SneakyThrows
     public Long startJob(final JobExecution parJobExecution) {
-        // 1 . récuper le jobexecution a relancer
-        final CustomJdbcJobExecutionDao customJdbcJobExecutionDao = new CustomJdbcJobExecutionDao(jdbcOperations);
-        final List<JobExecution> locLatestRunningJobs = customJdbcJobExecutionDao.getRunningJobExecutionsWithParams(parJobExecution.getId(), parJobExecution.getJobInstance().getJobName(), parJobExecution.getJobParameters());
+        // get the jobexecution to restart
+        final CustomJdbcJobExecutionDao locCustomJdbcJobExecutionDao = new CustomJdbcJobExecutionDao(jdbcOperations);
+        final List<JobExecution> locLatestRunningJobs = locCustomJdbcJobExecutionDao.getRunningJobExecutionsWithParams(parJobExecution.getId(), parJobExecution.getJobInstance().getJobName(), parJobExecution.getJobParameters());
 
-        JobExecution locJobExecutioin;
+        JobExecution locJobExecution;
 
         final JobExecutionService locJobExecutionService = new JobExecutionService(jobRepository, jobRegistry, jobLauncher);
         if (locLatestRunningJobs.isEmpty()) {
-            // rien faire
+            // do nothing
             return null;
-        } else if (null != (locJobExecutioin = locJobExecutionService.containtCompletedStatus(locLatestRunningJobs))) {
-            final Long locJobExecutionID = locJobExecutioin.getId();
+        }
+
+        if (null != (locJobExecution = locJobExecutionService.containtCompletedStatus(locLatestRunningJobs))) {
+            // job with the same parameter is running, we stop the new job that we are trying to execute
+            final Long locJobExecutionID = locJobExecution.getId();
             log.info("Job with id %d already running with same parameter {}", locJobExecutionID);
-            // job with the same parameter is running, we stop the new job we are trying to execute
             stopJpb(parJobExecution);
             return locJobExecutionID;
-        } else if ( null != (locJobExecutioin = locJobExecutionService.getFirstJobExecutioin(locLatestRunningJobs, parJobExecution.getJobParameters()))) {
-            log.info("job with id %d must be executed in first : {} ", locJobExecutioin.getId());
-            // récupere le plus anciaens job a execution et stopper celui accutelle
+        } else if ( null != (locJobExecution = locJobExecutionService.getFirstJobExecutioin(locLatestRunningJobs, parJobExecution.getJobParameters()))) {
+            log.info("job with id %d must be executed in first : {} ", locJobExecution.getId());
+            // get the oldest running job and stop the previous one
             stopJpb(parJobExecution);
-            // restart locJobExecutioin
-            return locJobExecutionService.restartJob(locJobExecutioin);
+            // restart locJobExecution
+            return locJobExecutionService.restartJob(locJobExecution);
         }
 
         return null;

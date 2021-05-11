@@ -1,4 +1,4 @@
-package com.jump;
+package com.jump.jobs;
 
 import com.jump.jobs.configs.CustomJdbcJobExecutionDao;
 import com.jump.jobs.configs.JobExecutionService;
@@ -28,7 +28,7 @@ import java.util.List;
 
 @EnableBinding({Source.class, Sink.class})
 @Slf4j
-public class ReceiveStatus {
+public class JobExecutionProgress {
     @Autowired
     private JobExplorer jobExplorer;
     @Autowired
@@ -47,11 +47,11 @@ public class ReceiveStatus {
     @SneakyThrows
     @StreamListener(target = Sink.INPUT, condition = "headers['custom_info']=='end'")
     public void receiveResult(final Message<JobEvent> parMsg) {
-        final JobEvent jobEvent = parMsg.getPayload();
-        final int parWorkerPartition = (int)parMsg.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION_ID);
-        log.info("[Server END] received result, partion SAVE : {} | partition WORKER {}", jobEventService.getJobEventById(jobEvent.getJobId()), parWorkerPartition);
+        final JobEvent locJobEvent = parMsg.getPayload();
+        final int locWorkerPartition = (int)parMsg.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION_ID);
+        log.info("[Server END] received result, partion SAVE : {} | partition WORKER {}", jobEventService.getJobEventById(locJobEvent.getJobId()), locWorkerPartition);
 
-        afterReceiveMsg(jobEvent, parWorkerPartition);
+        afterReceiveMsg(locJobEvent, locWorkerPartition);
     }
 
     @SneakyThrows
@@ -72,21 +72,21 @@ public class ReceiveStatus {
     }
 
     @SneakyThrows
-    private void afterReceiveMsg(final JobEvent jobEvent, final Integer parPartition) {
-        log.info("[Server] I received a message. {} from partition {}", jobEvent, parPartition);
-        final JobExecution locJobExecution = jobExplorer.getJobExecution(jobEvent.getJobExecutionId());
+    private void afterReceiveMsg(final JobEvent parJobEvent, final Integer parPartition) {
+        log.info("[Server] I received a message. {} from partition {}", parJobEvent, parPartition);
+        final JobExecution locJobExecution = jobExplorer.getJobExecution(parJobEvent.getJobExecutionId());
         assert locJobExecution != null;
         if (locJobExecution.getExitStatus().equals(ExitStatus.COMPLETED)) {
             return;
         }
-        locJobExecution.setExitStatus(new ExitStatus(jobEvent.getExitStatus()));
+        locJobExecution.setExitStatus(new ExitStatus(parJobEvent.getExitStatus()));
         jobRepository.update(locJobExecution);
         log.info("[Server] Update status JobExecution : {}", locJobExecution);
 
-        // start next job (if present) with same name
+        // start next job (if present) with same name & parameters
 
-        final CustomJdbcJobExecutionDao customJdbcJobExecutionDao = new CustomJdbcJobExecutionDao(jdbcOperations);
-        final List<JobExecution> locLatestRunningJobs = customJdbcJobExecutionDao.getRunningJobExecutionsWithParams(
+        final CustomJdbcJobExecutionDao locCustomJdbcJobExecutionDao = new CustomJdbcJobExecutionDao(jdbcOperations);
+        final List<JobExecution> locLatestRunningJobs = locCustomJdbcJobExecutionDao.getRunningJobExecutionsWithParams(
                 locJobExecution.getId(),
                 locJobExecution.getJobInstance().getJobName(),
                 locJobExecution.getJobParameters());

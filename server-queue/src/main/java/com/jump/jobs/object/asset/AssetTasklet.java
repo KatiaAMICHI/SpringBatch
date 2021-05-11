@@ -49,7 +49,7 @@ public class AssetTasklet implements Tasklet, StepExecutionListener {
 
     @Override
     public ExitStatus afterStep(final StepExecution parStepExecution) {
-        log.debug("Job executing in remote server");
+        log.debug("[AfterStep] Job executing in remote server");
         return ExitStatus.UNKNOWN;
     }
 

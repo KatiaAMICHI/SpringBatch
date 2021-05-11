@@ -15,34 +15,34 @@ public class CacheClient {
 
   private static final String JOBEVENTS = "jobevents";
 
-  private HazelcastInstance client = HazelcastClient.newHazelcastClient(creatClientConfig());
+  private HazelcastInstance _client = HazelcastClient.newHazelcastClient(creatClientConfig());
 
   public Collection<JobEvent> getAll() {
-    IMap<Long, JobEvent> map = client.getMap(JOBEVENTS);
-    return map.values();
+    final IMap<Long, JobEvent> locMapCache = _client.getMap(JOBEVENTS);
+    return locMapCache.values();
   }
 
-  public JobEvent put(final Long key, final JobEvent jobEvent) {
-    IMap<Long, JobEvent> map = client.getMap(JOBEVENTS);
-    return map.putIfAbsent(key, jobEvent);
+  public JobEvent put(final Long locId, final JobEvent locJobEvent) {
+    final IMap<Long, JobEvent> map = _client.getMap(JOBEVENTS);
+    return map.putIfAbsent(locId, locJobEvent);
   }
 
-  public JobEvent get(final Long key) {
-    IMap<Long, JobEvent> map = client.getMap(JOBEVENTS);
-    return map.get(key);
+  public JobEvent get(final Long locId) {
+    final IMap<Long, JobEvent> map = _client.getMap(JOBEVENTS);
+    return map.get(locId);
   }
 
   private ClientConfig creatClientConfig() {
-    ClientConfig clientConfig = new ClientConfig();
-    clientConfig.addNearCacheConfig(createNearCacheConfig());
-    return clientConfig;
+    final ClientConfig locClientConfig = new ClientConfig();
+    locClientConfig.addNearCacheConfig(createNearCacheConfig());
+    return locClientConfig;
   }
 
   private NearCacheConfig createNearCacheConfig() {
-    NearCacheConfig nearCacheConfig = new NearCacheConfig();
-    nearCacheConfig.setName(JOBEVENTS);
-    nearCacheConfig.setTimeToLiveSeconds(360);
-    nearCacheConfig.setMaxIdleSeconds(60);
-    return nearCacheConfig;
+    final NearCacheConfig locNearCacheConfig = new NearCacheConfig();
+    locNearCacheConfig.setName(JOBEVENTS);
+    locNearCacheConfig.setTimeToLiveSeconds(360);
+    locNearCacheConfig.setMaxIdleSeconds(60);
+    return locNearCacheConfig;
   }
 }

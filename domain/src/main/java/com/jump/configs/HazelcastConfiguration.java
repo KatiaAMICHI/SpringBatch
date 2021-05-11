@@ -19,18 +19,16 @@ public class HazelcastConfiguration {
 
     @Bean
     public HazelcastInstance hazelcastInstance() {
+        final Config locConfig = new Config();
+        final MapConfig locMapConfig = new MapConfig();
+        locMapConfig.setName("jobevents");
+        locMapConfig.setMaxSizeConfig(new MaxSizeConfig(200, MaxSizeConfig.MaxSizePolicy.FREE_HEAP_SIZE));
+        locMapConfig.setEvictionPolicy(EvictionPolicy.LRU);
+        locMapConfig.setTimeToLiveSeconds(60);
+        locConfig.setInstanceName("hazelcast-instance");
+        locConfig.addMapConfig(locMapConfig);
 
-        Config config = new Config();
-        // MapConfig configuration
-        MapConfig mapConfig = new MapConfig();
-        mapConfig.setName("jobevents");
-        mapConfig.setMaxSizeConfig(new MaxSizeConfig(200, MaxSizeConfig.MaxSizePolicy.FREE_HEAP_SIZE));
-        mapConfig.setEvictionPolicy(EvictionPolicy.LRU);
-        mapConfig.setTimeToLiveSeconds(60);
-
-        config.setInstanceName("hazelcast-instance");
-        config.addMapConfig(mapConfig);
-        return Hazelcast.newHazelcastInstance(config);
+        return Hazelcast.newHazelcastInstance(locConfig);
     }
 
     @Bean
