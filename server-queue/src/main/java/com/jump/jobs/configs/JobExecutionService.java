@@ -10,6 +10,8 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
 
+import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,7 +56,7 @@ public class JobExecutionService {
         }
     }
 
-    public JobExecution getFirstJobExecutioin(final List<JobExecution> parJobExecutions, @Nullable final JobParameters parParamJobParameters) {
+    public JobExecution getFirstJobExecutioin(@NotNull final List<JobExecution> parJobExecutions, @Nullable final JobParameters parParamJobParameters) {
         JobExecution locLatestExecution = null;
 
         if (parJobExecutions.isEmpty()) {

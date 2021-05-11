@@ -49,7 +49,7 @@ public class JobExecutionProgress {
     public void receiveResult(final Message<JobEvent> parMsg) {
         final JobEvent locJobEvent = parMsg.getPayload();
         final int locWorkerPartition = (int)parMsg.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION_ID);
-        log.info("[Server END] received result, partion SAVE : {} | partition WORKER {}", jobEventService.getJobEventById(locJobEvent.getJobId()), locWorkerPartition);
+        log.info("[Server END] received result, partition SAVE : {} | partition WORKER {}", jobEventService.getJobEventById(locJobEvent.getJobId()), locWorkerPartition);
 
         afterReceiveMsg(locJobEvent, locWorkerPartition);
     }
@@ -63,10 +63,10 @@ public class JobExecutionProgress {
 
         // save the jobEvent
         locJobEvent.setChannelPartition(parWorkerPartition);
-        final JobEvent newJobEvent = jobEventService.save(locJobEvent);
-        final Message<JobEvent> locMsg = MessageBuilder.withPayload(newJobEvent)
+        final JobEvent locNewJobEvent = jobEventService.save(locJobEvent);
+        final Message<JobEvent> locMsg = MessageBuilder.withPayload(locNewJobEvent)
                                                        .setHeader("custom_info", "processing")
-                                                       .setHeader(KafkaHeaders.PARTITION_ID, newJobEvent.getChannelPartition())
+                                                       .setHeader(KafkaHeaders.PARTITION_ID, locNewJobEvent.getChannelPartition())
                                                        .build();
         source.output().send(locMsg);
     }
@@ -94,8 +94,8 @@ public class JobExecutionProgress {
         if (!locLatestRunningJobs.isEmpty()) {
             final JobExecutionService locJobExecutionService = new JobExecutionService(jobRepository, jobRegistry, jobLauncher);
             final JobExecution locLatestRunningJob = locJobExecutionService.getFirstJobExecutioin(locLatestRunningJobs, null);
-            final Long locNewJobExectionId = locJobExecutionService.restartJob(locLatestRunningJob);
-            log.info("[Server] create new JobExection with id : {}", locNewJobExectionId);
+            final Long locNewJobExecutionId = locJobExecutionService.restartJob(locLatestRunningJob);
+            log.info("[Server] create new JobExecution with id : {}", locNewJobExecutionId);
         }
     }
 }

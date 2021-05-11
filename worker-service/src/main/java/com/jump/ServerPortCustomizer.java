@@ -18,10 +18,10 @@ class ServerPortCustomize implements WebServerFactoryCustomizer<ConfigurableWebS
     private Integer instanceCount;
 
     @Override
-    public void customize(final ConfigurableWebServerFactory factory) {
-        final int port = SocketUtils.findAvailableTcpPort(minPortNum, maxPortNum);
-        factory.setPort(port);
-        System.getProperties().put("server.port", port);
-        System.getProperties().put("spring.cloud.stream.instanceIndex", port-minPortNum);
+    public void customize(final ConfigurableWebServerFactory parFactory) {
+        final int locPort = SocketUtils.findAvailableTcpPort(minPortNum, maxPortNum);
+        parFactory.setPort(locPort);
+        System.getProperties().put("server.port", locPort);
+        System.getProperties().put("spring.cloud.stream.instanceIndex", locPort-minPortNum);
     }
 }

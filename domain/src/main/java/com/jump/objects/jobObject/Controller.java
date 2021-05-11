@@ -15,15 +15,15 @@ import java.util.Collection;
 public class Controller {
 
     @Autowired
-    private CacheClient cacheClient;
+    private CacheClient _cacheClient;
 
     @GetMapping("/getAll")
     public Collection<JobEvent> getAll() {
-        return cacheClient.getAll();
+        return _cacheClient.getAll();
     }
 
     @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
     public JobEvent get(@RequestParam(name = "jobid") final Long parJobId) {
-        return cacheClient.get(parJobId);
+        return _cacheClient.get(parJobId);
     }
 }

@@ -21,28 +21,28 @@ public class AssetTasklet implements Tasklet, StepExecutionListener {
 
     @Override
     public void beforeStep(final StepExecution parStepExecution) {
-        log.debug("Assettasket initialized");
+        log.debug("[BEFORE STEP] Asset tasket initialized");
     }
 
     @Override
     public RepeatStatus execute(final StepContribution parStepContribution, final ChunkContext parChunkContext) {
 
-        // soucis avec la deserializing du JobParameter quand le worker reçoit le message
-        final Map<String, Object> parameters =
+        // soucis avec la deserialisation du JobParameter quand le worker reçoit le message
+        final Map<String, Object> locParameters =
                 parStepContribution.getStepExecution().getJobParameters().getParameters()
                                 .entrySet().stream()
                                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
-        long jobId = parChunkContext.getStepContext().getStepExecution().getJobExecution().getJobId();
-        final BatchStatus status = parChunkContext.getStepContext().getStepExecution().getJobExecution().getStatus();
+        final long locJobId = parChunkContext.getStepContext().getStepExecution().getJobExecution().getJobId();
+        final BatchStatus locStatus = parChunkContext.getStepContext().getStepExecution().getJobExecution().getStatus();
 
-        final Long jobExecutionId = parChunkContext.getStepContext().getStepExecution().getJobExecution().getId();
-        final String path = "http://localhost:1111/asset/get?label=" + parameters.get("value");
+        final Long locJobExecutionId = parChunkContext.getStepContext().getStepExecution().getJobExecution().getId();
+        final String locPath = "http://localhost:1111/asset/get?label=" + locParameters.get("value");
 
-        final JobEvent payload = new JobEvent(jobId, jobExecutionId, parameters, path, status, "UNKNOWN", null);
-        final Message<JobEvent> partitionKey = MessageBuilder.withPayload(payload)
+        final JobEvent locPayload = new JobEvent(locJobId, locJobExecutionId, locParameters, locPath, locStatus, "UNKNOWN", null);
+        final Message<JobEvent> locPartitionKey = MessageBuilder.withPayload(locPayload)
                                                              .setHeader("custom_info", "start")
                                                              .build();
-        source.output().send(partitionKey);
+        source.output().send(locPartitionKey);
 
         return RepeatStatus.FINISHED;
     }

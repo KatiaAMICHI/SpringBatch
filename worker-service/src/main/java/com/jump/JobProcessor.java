@@ -13,6 +13,8 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.client.RestTemplate;
 
+import javax.validation.constraints.NotNull;
+
 @EnableBinding(Processor.class)
 @Slf4j
 public class JobProcessor {
@@ -22,38 +24,38 @@ public class JobProcessor {
 
     @StreamListener(target = Processor.INPUT, condition = "headers['custom_info']=='processing'")
     public void listenInfos(final Message<JobEvent> parMsg) throws InterruptedException {
-        final JobEvent in = parMsg.getPayload();
-        final int parPartition = (int)parMsg.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION_ID);
-        log.info("[Worker PROCESSING] received message : " + in + ", from partition : " + parPartition);
+        final JobEvent locPayload = parMsg.getPayload();
+        final int locPartition = (int)parMsg.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION_ID);
+        log.info("[Worker PROCESSING] received message : " + locPayload + ", from partition : " + locPartition);
     }
 
     @StreamListener(target = Processor.INPUT, condition = "headers['custom_info']=='start'")
     public void listenStart(final Message<JobEvent> parMsg) throws InterruptedException {
-        final JobEvent in = parMsg.getPayload();
+        final JobEvent locPayload = parMsg.getPayload();
         final int locPartition = (int)parMsg.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION_ID);
-        log.info("[Worker START] received message : " + in + ", from partition : " + locPartition);
+        log.info("[Worker START] received message from partition {}, {} : ", locPartition, locPayload);
 
         // envoyer un message d'avancement
-         Message<JobEvent> partitionKey = MessageBuilder.withPayload(in)
+         final Message<JobEvent> locMessageInfos = MessageBuilder.withPayload(locPayload)
                                                         .setHeader("custom_info", "infos")
                                                         .setHeader("worker_partition", locPartition)
                                                         .build();
-        processor.output().send(partitionKey);
-        Thread.sleep(20000);
+        processor.output().send(locMessageInfos);
+        Thread.sleep(10000 * locPartition + 10000);
         log.info("[Worker] received message - end sleep 10 s");
-        final Asset locResult = getResult(in.getPath());
+        final Asset locResult = getResult(locPayload.getPath());
 
-        in.setStatus(BatchStatus.COMPLETED);
-        in.setExitStatus("COMPLETED");
+        locPayload.setStatus(BatchStatus.COMPLETED);
+        locPayload.setExitStatus("COMPLETED");
 
-        partitionKey = MessageBuilder.withPayload(in)
+        final Message<JobEvent> locMessageEnd = MessageBuilder.withPayload(locPayload)
                                      .setHeader("custom_info", "end")
                                      .build();
-        log.info("[Worker START] sendding message to MASTER SERVER");
-        processor.output().send(partitionKey);
+        log.info("[Worker START] sending message to MASTER SERVER");
+        processor.output().send(locMessageEnd);
     }
 
-    private Asset getResult(final String parUrl) {
+    private Asset getResult(@NotNull final String parUrl) {
         final RestTemplate restTemplate = new RestTemplate();
         return restTemplate.getForObject(parUrl, Asset.class);
     }
