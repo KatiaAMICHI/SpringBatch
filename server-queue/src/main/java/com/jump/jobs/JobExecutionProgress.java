@@ -59,7 +59,7 @@ public class JobExecutionProgress {
     public void receiveInfos(final Message<JobEvent> parMsg) {
         final JobEvent locJobEvent = parMsg.getPayload();
         final int parWorkerPartition = (int)parMsg.getHeaders().get("worker_partition");
-        log.info("[Server INFOS] received infos, from partition {}", parWorkerPartition);
+        log.info("[Server INFOS] received infos, from partition {} with exit status {}.", parWorkerPartition, locJobEvent.getExitStatus());
 
         // save the jobEvent
         locJobEvent.setChannelPartition(parWorkerPartition);
