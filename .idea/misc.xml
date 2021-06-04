@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/jobs_core/pom.xml" />
+        <option value="$PROJECT_DIR$/jobs/pom.xml" />
+        <option value="$PROJECT_DIR$/jobs/client-job/pom.xml" />
+        <option value="$PROJECT_DIR$/jobs/jobs_core/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-server-sample/pom.xml" />
+        <option value="$PROJECT_DIR$/address-migrator/address-migrator-boot-client/pom.xml" />
+        <option value="$PROJECT_DIR$/address-migrator/pom.xml" />
+        <option value="$PROJECT_DIR$/address-migrator/address-migrator-core/pom.xml" />
+        <option value="$PROJECT_DIR$/lightmin-client/pom.xml" />
+        <option value="$PROJECT_DIR$/lightmin-client/jobs-boot-client/pom.xml" />
+        <option value="$PROJECT_DIR$/lightmin-server/pom.xml" />
+        <option value="$PROJECT_DIR$/lightmin-client/jobs-core/pom.xml" />
+        <option value="$PROJECT_DIR$/jobs/job-boot-client/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-client/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-client/spring-batch-lightmin-client-core/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-client/spring-batch-lightmin-client-discovery-consul/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-client/spring-batch-lightmin-client-discovery-core/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-core/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-core/spring-batch-lightmin-core-starter/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-core/spring-batch-lightmin-core-batch/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-core/spring-batch-lightmin-core-configuration/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-core/spring-batch-lightmin-core-service/pom.xml" />
+        <option value="$PROJECT_DIR$/job-boot-client/pom.xml" />
+      </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/LightminServer/pom.xml" />
+        <option value="$PROJECT_DIR$/address-migrator/pom.xml" />
+        <option value="$PROJECT_DIR$/client/boot-client/pom.xml" />
+        <option value="$PROJECT_DIR$/client/core/pom.xml" />
+        <option value="$PROJECT_DIR$/client/pom.xml" />
+        <option value="$PROJECT_DIR$/cloud-serveur/pom.xml" />
+        <option value="$PROJECT_DIR$/job-client/pom.xml" />
+        <option value="$PROJECT_DIR$/jobs/pom.xml" />
+        <option value="$PROJECT_DIR$/lightmin-client/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-api/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-client/pom.xml" />
+        <option value="$PROJECT_DIR$/spring-batch-lightmin-core/pom.xml" />
+        <option value="$PROJECT_DIR$/test/pom.xml" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
