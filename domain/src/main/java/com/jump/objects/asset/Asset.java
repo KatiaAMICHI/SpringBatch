@@ -29,10 +29,10 @@ public final class Asset implements Serializable {
         return sb.toString();
     }
 
-    private String toIndentedString(Object o) {
-        if (o == null) {
+    private String toIndentedString(final Object parObj) {
+        if (parObj == null) {
             return "null";
         }
-        return o.toString().replace("\n", "\n    ");
+        return parObj.toString().replace("\n", "\n    ");
     }
 }

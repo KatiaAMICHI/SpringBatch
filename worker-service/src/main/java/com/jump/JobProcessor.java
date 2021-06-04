@@ -1,7 +1,7 @@
 package com.jump;
 
-import com.jump.objects.jobObject.JobEvent;
 import com.jump.objects.asset.Asset;
+import com.jump.objects.jobObject.JobEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,11 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * permet d’ecouter / d’envoyer des messages du « server-queue »
+ *      Processor.input : pour ecouter
+ *      Processor.output : pour envoie
+ */
 @EnableBinding(Processor.class)
 @Slf4j
 public class JobProcessor {

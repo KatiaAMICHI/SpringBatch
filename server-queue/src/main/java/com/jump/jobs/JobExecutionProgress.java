@@ -2,7 +2,6 @@ package com.jump.jobs;
 
 import com.jump.jobs.configs.CustomJdbcJobExecutionDao;
 import com.jump.jobs.configs.JobExecutionService;
-import com.jump.objects.asset.Asset;
 import com.jump.objects.jobObject.JobEvent;
 import com.jump.objects.jobObject.JobEventService;
 import lombok.SneakyThrows;
@@ -22,10 +21,14 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+/**
+ * permet d’ecouter / d’envoyer des messages du « worker-service »
+ *      Source : pour ecouter
+ *      Sink : pour envoyer
+ */
 @EnableBinding({Source.class, Sink.class})
 @Slf4j
 public class JobExecutionProgress {

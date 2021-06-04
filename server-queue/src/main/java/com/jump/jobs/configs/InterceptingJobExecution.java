@@ -12,6 +12,9 @@ import org.springframework.jdbc.core.JdbcOperations;
 
 import java.util.List;
 
+/**
+ * permet d'intercepter l'execution d'un job
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Setter

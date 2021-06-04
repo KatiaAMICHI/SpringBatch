@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
+/**
+ * class qui permet de lancer des jobs a partir d'un appel API
+ */
 @RestController
 @Slf4j
 public class JobController {

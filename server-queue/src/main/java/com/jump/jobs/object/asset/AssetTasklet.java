@@ -14,6 +14,10 @@ import org.springframework.messaging.support.MessageBuilder;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * definition du tasklet d'un job
+ *      le message pour le worker est envoyé dans #execute(org.springframework.batch.core.StepContribution, org.springframework.batch.core.scope.context.ChunkContext)
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class AssetTasklet implements Tasklet, StepExecutionListener {

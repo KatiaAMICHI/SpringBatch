@@ -12,6 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Contient les requetes custom
+ */
 @RequiredArgsConstructor
 @Slf4j
 public class CustomJdbcJobExecutionDao extends JdbcJobExecutionDao {

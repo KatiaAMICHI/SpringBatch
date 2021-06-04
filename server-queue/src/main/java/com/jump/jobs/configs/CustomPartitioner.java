@@ -5,6 +5,9 @@ import org.apache.kafka.clients.producer.internals.DefaultPartitioner;
 import org.apache.kafka.common.Cluster;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * si on souhaite avoir changer le comportement du partitionnement par defaut de kafka
+ */
 @Configuration
 public class CustomPartitioner extends DefaultPartitioner {
 

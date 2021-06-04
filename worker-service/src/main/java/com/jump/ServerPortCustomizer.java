@@ -7,6 +7,9 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.stereotype.Component;
 import org.springframework.util.SocketUtils;
 
+/**
+ * Configuration coustom de l'instanceIndex pour chaque instance du worker-service
+ */
 @Component
 @Slf4j
 class ServerPortCustomize implements WebServerFactoryCustomizer<ConfigurableWebServerFactory> {

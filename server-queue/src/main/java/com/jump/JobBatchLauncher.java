@@ -2,21 +2,18 @@ package com.jump;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
-
+/**
+ * class qui permet de lancer des jobs a partir de l'annot @Scheduled
+ */
 @Configuration
 @Slf4j
 @EnableAsync

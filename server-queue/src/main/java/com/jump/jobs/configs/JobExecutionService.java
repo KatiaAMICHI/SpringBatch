@@ -11,10 +11,13 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobRepository;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * permet de relacer un job stopper
+ *          de recuperer le job stopper le plus ancien
+ */
 @RequiredArgsConstructor
 @Slf4j
 public class JobExecutionService {
