@@ -46,7 +46,7 @@ public class JobProcessor {
                                                         .setHeader("worker_partition", locPartition)
                                                         .build();
         processor.output().send(locMessageInfos);
-        Thread.sleep(10000 * locPartition + 10000);
+        Thread.sleep(20000);
         log.info("[Worker] received message - end sleep 10 s");
         final Asset locResult = getResult(locPayload.getPath());
 
