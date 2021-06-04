@@ -23,13 +23,13 @@ import javax.sql.DataSource;
 public class JobConfiguration {
 
     @Autowired
-    private JobRegistry jobRegistry;
+    private JobRegistry jobRegistry; // permet de garder une trace sur les jobs disponible dans le contexte
     @Autowired
-    private JobLauncher jobLauncher;
+    private JobLauncher jobLauncher; // permet d'executer un job et d'avoir l'instance du JobExecution associer
     @Autowired
-    private JobRepository jobRepository;
+    private JobRepository jobRepository; // permet de recuperer des infos de la base et de faire des modifications
     @Autowired
-    private JobExplorer jobExplorer;
+    private JobExplorer jobExplorer; // permet de taper dans la base pour avori des infos sur un job, step, jobexecution ....
 
     @Bean
     public JobRegistryBeanPostProcessor jobRepositoryBeanProcessor() throws Exception {
