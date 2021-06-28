@@ -17,9 +17,13 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.cloud.stream.messaging.Source;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.kafka.support.KafkaSendFailureException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.support.ErrorMessage;
 import org.springframework.messaging.support.MessageBuilder;
 
 import java.util.List;
@@ -46,6 +50,17 @@ public class JobExecutionProgress {
     private JobEventService jobEventService;
     @Autowired
     private Source source;
+
+    /**
+     * to intercept unsent messages
+     */
+    @ServiceActivator(inputChannel = "errorChannel")
+    public void errorChannel(final ErrorMessage em) {
+        final Message<?> locFailedMessage = ((KafkaSendFailureException) em.getPayload()).getFailedMessage();
+        assert locFailedMessage != null;
+        final MessageHeaders locHeaders = locFailedMessage.getHeaders();
+        log.info(" errorChannel, MESSAGE NOT SEND : {} ", locHeaders);
+    }
 
     @SneakyThrows
     @StreamListener(target = Sink.INPUT, condition = "headers['custom_info']=='end'")

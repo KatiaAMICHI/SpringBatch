@@ -46,7 +46,9 @@ public class AssetTasklet implements Tasklet, StepExecutionListener {
         final Message<JobEvent> locPartitionKey = MessageBuilder.withPayload(locPayload)
                                                              .setHeader("custom_info", "start")
                                                              .build();
-        source.output().send(locPartitionKey);
+        log.info("AVANY  sendsendsendsendsendsendsendsendsendsendsendsendsend : ");
+        final boolean send = source.output().send(locPartitionKey);
+        //log.info("APRES sendsendsendsendsendsendsendsendsendsendsendsendsend : " + send);
 
         return RepeatStatus.FINISHED;
     }
