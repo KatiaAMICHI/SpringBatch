@@ -1,4 +1,4 @@
-package com.jump.jobconfig;
+package com.jump.remotepartition;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -23,7 +23,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 @Configuration
 @EnableBatchProcessing
 @EnableBatchIntegration
-@Profile("master")
+//@Profile("master")
 public class MasterRemoteJob {
     static String TOPIC = "step-execution-eventslol";
 
@@ -62,7 +62,7 @@ public class MasterRemoteJob {
     public Step masterStep() throws Exception {
         return remotePartitioningManager
                 .get("step1_manager")
-                .partitioner("step1_worker", new BasicPartitioner()).gridSize(2)
+                .partitioner("step1_worker", new BasicPartitioner()).gridSize(1)
                 .repository(jobRepository)
                 .outputChannel(requests())
                 .build();

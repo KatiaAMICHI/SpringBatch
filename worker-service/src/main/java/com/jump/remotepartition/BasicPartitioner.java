@@ -1,4 +1,4 @@
-package com.jump.jobconfig;
+package com.jump.remotepartition;
 
 import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.item.ExecutionContext;
