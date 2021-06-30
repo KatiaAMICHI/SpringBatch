@@ -39,7 +39,7 @@ public class InterceptingJobExecution implements JobExecutionListener {
     @SneakyThrows
     public Long startJob(final JobExecution parJobExecution) {
         // get the jobexecution to restart
-        final CustomJdbcJobExecutionDao locCustomJdbcJobExecutionDao = new CustomJdbcJobExecutionDao(jdbcOperations);
+        /*final CustomJdbcJobExecutionDao locCustomJdbcJobExecutionDao = new CustomJdbcJobExecutionDao(jdbcOperations);
         final List<JobExecution> locLatestRunningJobs = locCustomJdbcJobExecutionDao.getRunningJobExecutionsWithParams(parJobExecution.getId(), parJobExecution.getJobInstance().getJobName(), parJobExecution.getJobParameters());
 
         JobExecution locJobExecution;
@@ -63,7 +63,7 @@ public class InterceptingJobExecution implements JobExecutionListener {
             // restart locJobExecution
             return locJobExecutionService.restartJob(locJobExecution);
         }
-
+        */
         return null;
     }
 

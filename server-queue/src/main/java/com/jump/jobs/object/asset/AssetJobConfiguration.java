@@ -8,7 +8,6 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,7 +44,6 @@ public class AssetJobConfiguration {
     return jobBuilderFactory
             .get("jobasset")
             .start(workerStep())
-            .incrementer(new RunIdIncrementer())
             .listener(new InterceptingJobExecution(jobRepository, jdbcOperations, jobRegistry, jobLauncher))
             .build();
   }
