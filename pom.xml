@@ -24,12 +24,22 @@
         <spring-cloud.version>2.2.4.RELEASE</spring-cloud.version>
         <spring-batch.version>4.2.3.RELEASE</spring-batch.version>
         <lombok.version>1.18.10</lombok.version>
-        <jackson.version>2.10.5</jackson.version>
         <slf4j.version>1.7.25</slf4j.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>de.ruedigermoeller</groupId>
+                <artifactId>fst</artifactId>
+                <version>2.57</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.objenesis</groupId>
+                        <artifactId>objenesis</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
             <!-- spring boot -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
