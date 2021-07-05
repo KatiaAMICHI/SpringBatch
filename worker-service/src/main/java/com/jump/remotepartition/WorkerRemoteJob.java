@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
@@ -29,9 +30,10 @@ import org.springframework.kafka.listener.KafkaMessageListenerContainer;
 @Configuration
 @EnableBatchProcessing
 @EnableBatchIntegration
-//@Profile("worker")
+@Profile("worker11")
 public class WorkerRemoteJob {
     static String TOPIC = "step-execution-eventslol";
+    static String GROUP_ID = "stepresponse_partition";
 
     @Autowired
     private JobRepository jobRepository;
@@ -48,7 +50,7 @@ public class WorkerRemoteJob {
     @Bean
     public IntegrationFlow inboundFlow() {
         final ContainerProperties containerProps = new ContainerProperties(TOPIC);
-        containerProps.setGroupId("stepresponse");
+        containerProps.setGroupId(GROUP_ID);
 
         final KafkaMessageListenerContainer container = new KafkaMessageListenerContainer(kafkaFactory, containerProps);
         final KafkaMessageDrivenChannelAdapter kafkaMessageChannel = new KafkaMessageDrivenChannelAdapter(container);
@@ -82,31 +84,5 @@ public class WorkerRemoteJob {
             return RepeatStatus.FINISHED;
         };
     }
-
-    @Bean("itemReader")
-    public ItemReader<String> itemReader() {
-        log.info("[Worker].................. ItemReader");
-        return new CustomerItemReader();
-    }
-
-    @Bean("itemWriter")
-    public ItemWriter<? super Object> itemWriter() {
-        log.info(".................. itemWriter");
-        return object -> {
-            log.info("Write: {}", object);
-        };
-    }
-
-    /*@SneakyThrows
-    @StreamListener(target = CustomSink.INPUT_MASTER)
-    public void inPut(final Message<?> parMsg) {
-        log.info("[WORKER Server INPUT]");
-    }
-
-    @SneakyThrows
-    @StreamListener(target = CustomSource.OUTPUT_MASTER)
-    public void outPut(final Message<?> parMsg) {
-        log.info("[WORKER Server OUTPUT]");
-    }*/
 
 }

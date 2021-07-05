@@ -32,11 +32,14 @@ public final class GlobalFSTSerializer<T> implements Serializer<T> {
   @SneakyThrows
   @Override
   public byte[] serialize(String s, Object object) {
+    if (null == object) {
+      return null;
+    }
     try {
       return conf.get().asByteArray(object);
     } catch (Exception e) {
       log.error(e.getMessage());
-      throw new IOException(e);
+      throw new IOException("Failed to serialize object : " + object.getClass(), e);
     }
 
   }

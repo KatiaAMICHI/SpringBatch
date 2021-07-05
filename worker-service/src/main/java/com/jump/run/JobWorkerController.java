@@ -18,11 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Slf4j
-@Profile("master")
+//@Profile("master")
 public class JobWorkerController {
     @Autowired
     private JobLauncher jobLauncher;
-    @Autowired @Qualifier("job_partition_master")
+    //@Autowired @Qualifier("job_partition_master")
+     private Job job_partition;
+    @Autowired @Qualifier("remoteJob")
     private Job job;
 
     @RequestMapping("/startjobs")
@@ -32,6 +34,17 @@ public class JobWorkerController {
             //Thread.sleep(2000);
             final int locNewIndex = locIndex;
             new Thread(() -> runJobB(this.job, parLabel + locNewIndex)).start();
+        }
+        return "status";
+    }
+
+    @RequestMapping("/startjobs_partition")
+    public String startJobsPartition(@RequestParam(value = "label") final String parLabel, @RequestParam(value = "index") final int parIndex) {
+        log.info("runnig job with label value : " + parLabel);
+        for (int locIndex = 0; locIndex<parIndex; locIndex++) {
+            //Thread.sleep(2000);
+            final int locNewIndex = locIndex;
+            new Thread(() -> runJobB(this.job_partition, parLabel + locNewIndex)).start();
         }
         return "status";
     }

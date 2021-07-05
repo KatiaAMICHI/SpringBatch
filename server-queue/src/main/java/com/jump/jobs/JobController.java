@@ -28,7 +28,9 @@ public class JobController {
         log.info("runnig job with label value : " + parLabel);
         for (int locIndex = 0; locIndex<parIndex; locIndex++) {
             //Thread.sleep(2000);
-            runJobB(this.job, parLabel + locIndex);
+            //runJobB(this.job, parLabel + locIndex);
+            int finalLocIndex = locIndex;
+            new Thread(() -> runJobB(this.job, parLabel + finalLocIndex)).start();
         }
         return "status";
     }

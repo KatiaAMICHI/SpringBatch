@@ -64,7 +64,7 @@ public class JobProcessor {
         System.out.println(" -----  EventListener : "  + event);
     }*/
 
-    static private KafkaConsumer consumer;
+    //static private KafkaConsumer consumer;
 
     //@StreamListener(target = Processor.INPUT, condition = "headers['custom_info']=='start' && @customFilter.stratfun('star', headers['kafka_consumer'])")
     @StreamListener(target = Sink.INPUT, condition = "headers['custom_info']=='start'")
@@ -72,16 +72,16 @@ public class JobProcessor {
         final JobEvent locPayload = parMsg.getPayload();
         final int locPartition = (int)parMsg.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION_ID);
         log.info("[Worker START] received message from partition {}, {} : ", locPartition, locPayload);
-        consumer = (KafkaConsumer) parMsg.getHeaders().get(KafkaHeaders.CONSUMER);
+        //consumer = (KafkaConsumer) parMsg.getHeaders().get(KafkaHeaders.CONSUMER);
 
-        if (false) {
+        /*if (false) {
             //((Acknowledgment)parMsg.getHeaders().get(KafkaHeaders.ACKNOWLEDGMENT)).nack(10000);
             consumer.commitSync();
             //consumer.unsubscribe();
             consumer.close(Duration.ofMillis(1000));
             //bindingsEndpoint.changeState("input", BindingsEndpoint.State.STOPPED);
             return;
-        }
+        }*/
 
         log.info("[Worker START] received message from partition {}, {} : ", locPartition, locPayload);
 

@@ -21,6 +21,7 @@ import org.apache.kafka.common.serialization.Deserializer;
 import org.nustaq.serialization.FSTConfiguration;
 
 
+
 @Slf4j
 public final class GlobalFSTDeserializer<T> implements Deserializer<T> {
 
@@ -29,6 +30,6 @@ public final class GlobalFSTDeserializer<T> implements Deserializer<T> {
   @SuppressWarnings("unchecked")
   @Override
   public T deserialize(String s, byte[] bytes) {
-    return (T)conf.get().asObject(bytes);
+    return null == bytes ? null : (T)conf.get().asObject(bytes);
   }
 }

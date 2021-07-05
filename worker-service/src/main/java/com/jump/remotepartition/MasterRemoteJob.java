@@ -23,7 +23,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 @Configuration
 @EnableBatchProcessing
 @EnableBatchIntegration
-//@Profile("master")
+@Profile("master1")
 public class MasterRemoteJob {
     static String TOPIC = "step-execution-eventslol";
 
@@ -62,7 +62,7 @@ public class MasterRemoteJob {
     public Step masterStep() throws Exception {
         return remotePartitioningManager
                 .get("step1_manager")
-                .partitioner("step1_worker", new BasicPartitioner()).gridSize(1)
+                .partitioner("step1_worker", new BasicPartitioner()).gridSize(3)
                 .repository(jobRepository)
                 .outputChannel(requests())
                 .build();
