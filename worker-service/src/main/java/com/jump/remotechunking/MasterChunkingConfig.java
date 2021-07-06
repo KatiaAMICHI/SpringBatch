@@ -4,19 +4,25 @@ import com.jump.configs.CustomChunkListener;
 import com.jump.objects.jobObject.JobEvent;
 import com.jump.remotepartition.CustomerItemReader;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter;
 import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
 import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
+import org.springframework.batch.item.support.SynchronizedItemStreamReader;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.expression.common.LiteralExpression;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
@@ -48,9 +55,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableBatchIntegration
 //@Profile("master")
 public class MasterChunkingConfig {
-    static String TOPIC_REQUESTS = "step-execution-eventslol_chunking_requests";
-    static String TOPIC_REPLIES = "step-execution-eventslol_chunking_replies";
-    static String GROUP_ID = "stepresponse_chunking";
+
 
     @Autowired
     private ConsumerFactory kafkaFactory;
@@ -62,29 +67,22 @@ public class MasterChunkingConfig {
 	private JobBuilderFactory jobBuilderFactory;
     @Autowired
     private RemoteChunkingManagerStepBuilderFactory masterStepBuilderFactory;
-
-
-    @Bean
-    public DirectChannel requests_chunking() {
-        return new DirectChannel();
-    }
-
-    @Bean
-    public PollableChannel replies_chunking() {
-        return new QueueChannel();
-    }
+    @Autowired
+    private DirectChannel requests_chunking;
+    @Autowired
+    private QueueChannel replies_chunking;
 
     /**
      * envoyer des message au worker slave, pour executer le process/write items apres le read
      * @return
      */
     @Bean
-    public IntegrationFlow outboundFlow() {
+    public IntegrationFlow outboundFlowMaster() {
         final KafkaProducerMessageHandler kafkaMessageHandler = new KafkaProducerMessageHandler(kafkaTemplate);
-        kafkaMessageHandler.setTopicExpression(new LiteralExpression(TOPIC_REQUESTS));
+        kafkaMessageHandler.setTopicExpression(new LiteralExpression(ChunkingConfig.TOPIC_REQUESTS));
 
         return IntegrationFlows
-                .from(requests_chunking())
+                .from(requests_chunking)
                 //.handle(Kafka.outboundChannelAdapter(kafkaTemplate).topic(TOPIC_REQUESTS))
                 .handle(kafkaMessageHandler)
                 .get();
@@ -95,26 +93,27 @@ public class MasterChunkingConfig {
      *
      * @return
      */
-        @Bean
-        public IntegrationFlow inboundFlow() {
-            final ContainerProperties containerProps = new ContainerProperties(TOPIC_REPLIES);
-            containerProps.setGroupId(GROUP_ID);
-            final KafkaMessageListenerContainer container = new KafkaMessageListenerContainer(kafkaFactory, containerProps);
-            final KafkaMessageDrivenChannelAdapter kafkaMessageChannel = new KafkaMessageDrivenChannelAdapter(container);
+    @Bean
+    public IntegrationFlow inboundFlowMaster() {
+        final ContainerProperties containerProps = new ContainerProperties(ChunkingConfig.TOPIC_REPLIES);
+        containerProps.setGroupId(ChunkingConfig.GROUP_ID);
+        final KafkaMessageListenerContainer container = new KafkaMessageListenerContainer(kafkaFactory, containerProps);
+        final KafkaMessageDrivenChannelAdapter kafkaMessageChannel = new KafkaMessageDrivenChannelAdapter(container);
 
 
-            return IntegrationFlows
-                    //.from(Kafka.messageDrivenChannelAdapter(container))
-                    .from(kafkaMessageChannel)
-                    .channel(replies_chunking())
-                    .get();
-    }
+        return IntegrationFlows
+                //.from(Kafka.messageDrivenChannelAdapter(container))
+                .from(kafkaMessageChannel)
+                .channel(replies_chunking)
+                .get();
+}
 
 	@Bean
 	public Job remoteJob() {
 		return jobBuilderFactory
                 .get("remoteJob")
-				.start(masterStep_ch())
+                .incrementer(new RunIdIncrementer())
+                .start(masterStep_ch())
 				.build();
 	}
 
@@ -128,23 +127,39 @@ public class MasterChunkingConfig {
         return  masterStepBuilderFactory
                 .get("masterStep_ch")
                 .chunk(1)
-                .outputChannel(requests_chunking()) // requests sent to workers
-                .inputChannel(replies_chunking())   // replies received from workers
-                .reader(reader())
+                .outputChannel(requests_chunking) // requests sent to workers
+                .inputChannel(replies_chunking)   // replies received from workers
+                .reader(itemReader())
                 .taskExecutor(taskExecutor)
-                .listener(new CustomChunkListener())
+                //.listener(new CustomChunkListener())
                 .stepOperations(repeatTemplate)
-                .repository(jobRepository)
+                //.repository(jobRepository)
                 .build();
     }
 
+
+    /*@Bean
+    public MultiResourceItemReader<String> multiResourceItemReader() {
+        MultiResourceItemReader<String> resourceItemReader = new MultiResourceItemReader<String>();
+        resourceItemReader.setResources(resources); // can passe multipl files
+        resourceItemReader.setDelegate(reader());
+        return resourceItemReader;
+    }*/
+
     @Bean
-    public ItemReader<String> reader() {
+    @StepScope
+    public ItemReader<String> itemReader() {
+        SynchronizedItemStreamReader<String> synchronizedItemStreamReader = new SynchronizedItemStreamReader();
         log.info("[MASTER Worker].................. ItemReader");
         final FlatFileItemReader<String> reader = new FlatFileItemReader<String>();
         reader.setResource(new ClassPathResource("data/fileTMP.txt"));
         reader.setLineMapper(new PassThroughLineMapper());
-        return reader;
+        reader.open(new ExecutionContext());
+        synchronizedItemStreamReader.setDelegate(reader);
+
+
+        return synchronizedItemStreamReader;
     }
+
 
 }

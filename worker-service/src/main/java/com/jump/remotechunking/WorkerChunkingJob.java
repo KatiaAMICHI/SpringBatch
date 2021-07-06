@@ -6,6 +6,7 @@ import org.springframework.batch.integration.async.AsyncItemProcessor;
 import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;
 import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,16 +24,17 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.KafkaMessageListenerContainer;
+import org.springframework.batch.item.support.SynchronizedItemStreamWriter;
+
+import java.util.List;
+
 
 @Slf4j
 @Configuration
 @EnableBatchProcessing
 @EnableBatchIntegration
-@Profile("worker")
+//@Profile("worker")
 public class WorkerChunkingJob {
-    static String TOPIC_REQUESTS = "step-execution-eventslol_chunking_requests";
-    static String TOPIC_REPLIES = "step-execution-eventslol_chunking_replies";
-    static String GROUP_ID = "stepresponse_chunking";
 
     @Autowired
     private RemoteChunkingWorkerBuilder remoteChunkingWorkerBuilder;
@@ -41,15 +43,10 @@ public class WorkerChunkingJob {
     @Autowired
     private KafkaTemplate kafkaTemplate;
 
-    @Bean
-    public DirectChannel requests_chunking() {
-        return new DirectChannel();
-    }
-
-    @Bean
-    public QueueChannel replies_chunking() {
-        return new QueueChannel();
-    }
+    @Autowired
+    private DirectChannel requests_chunking;
+    @Autowired
+    private QueueChannel replies_chunking;
 
     /**
      * ecouter les message du worker manager
@@ -57,9 +54,9 @@ public class WorkerChunkingJob {
      * @return
      */
     @Bean
-    public IntegrationFlow inboundFlow() {
-        final ContainerProperties containerProps = new ContainerProperties(TOPIC_REQUESTS);
-        containerProps.setGroupId(GROUP_ID);
+    public IntegrationFlow inboundFlowWorker() {
+        final ContainerProperties containerProps = new ContainerProperties(ChunkingConfig.TOPIC_REQUESTS);
+        containerProps.setGroupId(ChunkingConfig.GROUP_ID);
 
         final KafkaMessageListenerContainer container = new KafkaMessageListenerContainer(kafkaFactory, containerProps);
         final KafkaMessageDrivenChannelAdapter kafkaMessageChannel = new KafkaMessageDrivenChannelAdapter(container);
@@ -67,7 +64,7 @@ public class WorkerChunkingJob {
         return IntegrationFlows
                 //.from(Kafka.messageDrivenChannelAdapter(container))
                 .from(kafkaMessageChannel)
-                .channel(requests_chunking())
+                .channel(requests_chunking)
                 .get();
     }
 
@@ -77,48 +74,45 @@ public class WorkerChunkingJob {
      * @return
      */
     @Bean
-    public IntegrationFlow outboundFlow() {
+    public IntegrationFlow outboundFlowWorker() {
         final KafkaProducerMessageHandler kafkaMessageHandler = new KafkaProducerMessageHandler(kafkaTemplate);
-        kafkaMessageHandler.setTopicExpression(new LiteralExpression(TOPIC_REPLIES));
-        kafkaMessageHandler.setSendSuccessChannel(replies_chunking());
-        kafkaMessageHandler.setOutputChannel(replies_chunking());
+        kafkaMessageHandler.setTopicExpression(new LiteralExpression(ChunkingConfig.TOPIC_REPLIES));
+        kafkaMessageHandler.setSendSuccessChannel(replies_chunking);
+        kafkaMessageHandler.setOutputChannel(replies_chunking);
 
         return IntegrationFlows
-                .from(replies_chunking())
+                .from(replies_chunking)
                 //.handle(Kafka.outboundChannelAdapter(kafkaTemplate).topic(TOPIC_REPLIES))
                 .handle(kafkaMessageHandler)
                 .get();
     }
 
     @Bean
-    public IntegrationFlow workerIntegrationFlow() throws Exception {
+    public IntegrationFlow workerIntegrationFlow() {
         return this.remoteChunkingWorkerBuilder
-                .inputChannel(requests_chunking())
-                .outputChannel(replies_chunking())
+                .inputChannel(requests_chunking)
+                .outputChannel(replies_chunking)
                 .itemProcessor(itemProcessor())
                 .itemWriter(itemWriter())
                 .build();
     }
 
-
-    @Bean
     public ItemWriter<? super Object> itemWriter() {
+        SynchronizedItemStreamWriter<Object> synchronizedItemStreamWriter = new SynchronizedItemStreamWriter();
         log.info(".................. itemWriter");
-        return object -> {
-            log.info("Before SLEEP 6 S >> Write: {}", object);
-            Thread.sleep(6000);
-            log.info("Write: {}", object);
-        };
+        final ItemStreamWriter<Object> writer = new Writer1();
+
+        synchronizedItemStreamWriter.setDelegate(writer);
+        return writer;
     }
 
-    @Bean
     public ItemProcessor<Object, Object> itemProcessor() {
         log.info(".................. processor");
         return new ItemProcessor<Object, Object>() {
             @Override
             public Object process(Object parObj) throws Exception {
                 //parObj.setLabel("newLabel");
-                log.info("Pause for 6 seconds");
+                log.info("Pause for 6 seconds parObj :" + parObj);
                 Thread.sleep(10000);
                 return parObj;
             }
