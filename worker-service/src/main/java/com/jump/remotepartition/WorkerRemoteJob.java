@@ -30,36 +30,17 @@ import org.springframework.kafka.listener.KafkaMessageListenerContainer;
 @Configuration
 @EnableBatchProcessing
 @EnableBatchIntegration
-@Profile("worker11")
+//@Profile("worker11")
 public class WorkerRemoteJob {
-    static String TOPIC = "step-execution-eventslol";
-    static String GROUP_ID = "stepresponse_partition";
 
     @Autowired
     private JobRepository jobRepository;
     @Autowired
     private RemotePartitioningWorkerStepBuilderFactory workerStepBuilderFactory;
     @Autowired
-    private ConsumerFactory kafkaFactory;
+    private DirectChannel requests;
 
-    @Bean
-    public DirectChannel requests() {
-        return new DirectChannel();
-    }
 
-    @Bean
-    public IntegrationFlow inboundFlow() {
-        final ContainerProperties containerProps = new ContainerProperties(TOPIC);
-        containerProps.setGroupId(GROUP_ID);
-
-        final KafkaMessageListenerContainer container = new KafkaMessageListenerContainer(kafkaFactory, containerProps);
-        final KafkaMessageDrivenChannelAdapter kafkaMessageChannel = new KafkaMessageDrivenChannelAdapter(container);
-
-        return IntegrationFlows
-                .from(kafkaMessageChannel)
-                .channel(requests())
-                .get();
-    }
 
     @Bean("step1_worker")
     public Step workerStep() {
@@ -67,7 +48,7 @@ public class WorkerRemoteJob {
         repeatTemplate.setThrottleLimit(1);
         return workerStepBuilderFactory
                 .get("step1_worker")
-                .inputChannel(requests())
+                .inputChannel(requests)
                 .repository(jobRepository)
                 .tasklet(tasklet(null))
                 .taskExecutor(new SimpleAsyncTaskExecutor())

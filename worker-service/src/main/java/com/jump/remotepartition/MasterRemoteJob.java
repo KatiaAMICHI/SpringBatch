@@ -23,33 +23,20 @@ import org.springframework.kafka.core.KafkaTemplate;
 @Configuration
 @EnableBatchProcessing
 @EnableBatchIntegration
-@Profile("master1")
+//@Profile("master1")
 public class MasterRemoteJob {
-    static String TOPIC = "step-execution-eventslol";
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
     @Autowired
     private RemotePartitioningManagerStepBuilderFactory remotePartitioningManager;
-    @Autowired
-    private KafkaTemplate kafkaTemplate;
+
     @Autowired
     private JobRepository jobRepository;
+    @Autowired
+    private DirectChannel requests;
 
-    @Bean
-    public DirectChannel requests() {
-        return new DirectChannel();
-    }
 
-    @Bean
-    public IntegrationFlow outboundFlow() {
-        final KafkaProducerMessageHandler kafkaMessageHandler = new KafkaProducerMessageHandler(kafkaTemplate);
-        kafkaMessageHandler.setTopicExpression(new LiteralExpression(TOPIC));
-        return IntegrationFlows
-                .from(requests())
-                .handle(kafkaMessageHandler)
-                .get();
-    }
 
     @Bean("job_partition_master")
     public Job job() throws Exception {
@@ -64,7 +51,7 @@ public class MasterRemoteJob {
                 .get("step1_manager")
                 .partitioner("step1_worker", new BasicPartitioner()).gridSize(3)
                 .repository(jobRepository)
-                .outputChannel(requests())
+                .outputChannel(requests)
                 .build();
     }
 }

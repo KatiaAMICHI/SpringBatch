@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class JobWorkerController {
     @Autowired
     private JobLauncher jobLauncher;
-    //@Autowired @Qualifier("job_partition_master")
+    @Autowired @Qualifier("job_partition_master")
      private Job job_partition;
     @Autowired @Qualifier("remoteJob")
     private Job job;

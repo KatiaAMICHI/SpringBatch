@@ -20,12 +20,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
 @Configuration
-public class JobConfiguration {
+public class JobConfiguration extends DefaultBatchConfigurer {
 
     @Autowired
     private JobRegistry jobRegistry; // permet de garder une trace sur les jobs disponible dans le contexte
@@ -40,7 +41,7 @@ public class JobConfiguration {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
-    @Bean
+    /*@Bean
     public JobOperator jobOperator() throws Exception {
         final SimpleJobOperator jobOperator = new SimpleJobOperator();
         jobOperator.setJobLauncher(jobLauncher);
@@ -55,9 +56,10 @@ public class JobConfiguration {
     public JdbcOperations jdbcOperations() {
         return new JdbcTemplate(dataSource);
     }
-
-    @Bean
-    public JobExplorer jobExplorer() throws Exception {
+*/
+    @SneakyThrows
+    @Override
+    public JobExplorer getJobExplorer() {
         final JobExplorerFactoryBean bean = new JobExplorerFactoryBean();
         bean.setDataSource(dataSource);
         bean.setTablePrefix("BATCH_");
@@ -66,8 +68,9 @@ public class JobConfiguration {
         return bean.getObject();
     }
 
-    @Bean
-    public JobLauncher jobLauncher() throws Exception {
+    @SneakyThrows
+    @Override
+    public JobLauncher getJobLauncher() {
         final SimpleJobLauncher locLauncher = new SimpleJobLauncher();
         locLauncher.setJobRepository(jobRepository);
         locLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
@@ -75,8 +78,18 @@ public class JobConfiguration {
         return locLauncher;
     }
 
-    @Bean
-    protected JobRepository createJobRepository() throws Exception {
+    /*@Bean
+    public ThreadPoolTaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(15);
+        taskExecutor.setMaxPoolSize(20);
+        taskExecutor.setQueueCapacity(30);
+        return taskExecutor;
+    }*/
+
+    @SneakyThrows
+    @Override
+    public JobRepository getJobRepository() {
         final JobRepositoryFactoryBean locFactory = new JobRepositoryFactoryBean();
         locFactory.setDataSource(dataSource);
         locFactory.setTransactionManager(transactionManager);
@@ -92,8 +105,13 @@ public class JobConfiguration {
         return new JobBuilderFactory(jobRepository);
     }
 
+    @Override
+    public PlatformTransactionManager getTransactionManager() {
+        return transactionManager;
+    }
+
     // erreur JPA sans la configue
-    @Bean
+    /*@Bean
     public BatchConfigurer configurer(){
         return new DefaultBatchConfigurer(dataSource) {
             @SneakyThrows
@@ -102,6 +120,6 @@ public class JobConfiguration {
                 return createJobRepository();
             }
         };
-    }
+    }*/
 
 }
